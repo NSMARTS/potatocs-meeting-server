@@ -20,10 +20,9 @@ app.use(express.json())
  * aws s3
 ******************/
 const AWS = require('aws-sdk');
-const fs = require("fs");
-
+const fs = require("fs"); 
 const config = require('./config/config');
-
+  
 /*-----------------------------------------
 
  S3 관련 설정
