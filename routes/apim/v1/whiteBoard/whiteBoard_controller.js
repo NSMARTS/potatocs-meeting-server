@@ -229,7 +229,7 @@ exports.deleteMeetingPdfFile = async (req, res) => {
         if (!req.query._id) {
             return res.status(400).send('invalid meeting id1');
         }
-        
+
         const criteria = {
             meetingId: req.query._id,
         }
