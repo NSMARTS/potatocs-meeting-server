@@ -47,6 +47,12 @@ global.AWS_S3 = {
 
 // [API] Routers
 app.use('/apim/v1', require('./routes/apim/v1'));
+// app.post('/deleteMeetingPdfFile', (req, res) => {
+//     console.log('[[[[ deleteMeetingPdfFile ]]]]', req.body._id)
+
+//     app.use('/apim/v1/whiteBoard/deleteMeetingPdfFile/', { params: req.body._id })
+ 
+// })
 
 // test
 
@@ -62,12 +68,7 @@ app.use('/', express.static(path.join(__dirname, '/client')));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
 
-app.post('/joinMeeting', (req, res) => {
-    console.log('[ joinMeeting ]', req.body)
 
-    
-    res.send('/apim/v1/whiteBoard/meetingInfo')
-})
 
 
 

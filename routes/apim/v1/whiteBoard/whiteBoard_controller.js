@@ -16,7 +16,7 @@ exports.meetingInfo = async (req, res) => {
 --------------------------------------------------`);
     const dbModels = global.DB_MODELS;
     console.log(dbModels)
- 
+
     // const criteria = {
     //     _id: new mongoose.Types.ObjectId(),
     //     meetingName: 'testRoom',
@@ -28,17 +28,17 @@ exports.meetingInfo = async (req, res) => {
     // 미팅 아이디
     const criteria = {
         _id: req.params.meetingId
-    } 
+    }
 
     // 스페이스에서 받은 미팅정보와 DB에 저장되어있는 미팅정보 비교
     try {
-      
+
         let meetingInfo = await dbModels.Meeting.findOne(criteria).populate('enlistedMembers')
 
         console.log(meetingInfo)
-   
 
-        
+
+
         // 유효성 검사
         if (meetingInfo) {
             //임시 미팅 생성 시작
@@ -58,13 +58,13 @@ exports.meetingInfo = async (req, res) => {
             }
 
             dbModels.Doc.init();
-            let DocInfo = await dbModels.Doc.findOne({meetingId: docObj.meetingId});
+            let DocInfo = await dbModels.Doc.findOne({ meetingId: docObj.meetingId });
             // Doc이 없는 경우
-            if(!DocInfo){
+            if (!DocInfo) {
                 const docData = new dbModels.Doc(docObj);
                 await docData.save();
             }
-            
+
         } else {
             res.status(500).send('internal server error');
         }
@@ -142,14 +142,14 @@ exports.document = async (req, res) => {
         console.log(key)
         res.attachment(key);
         var file = s3.getObject({
-          Bucket: "potatocs-meeting-pdf",
-          Key: key
-          }).createReadStream()
+            Bucket: "potatocs-meeting-pdf",
+            Key: key
+        }).createReadStream()
             .on("error", error => {
             });
-         file.pipe(res);
+        file.pipe(res);
     })
-    
+
     // dbModels.Doc.findOne(criteria).then((result) => {
     //     const filePath = `./` + result.savePath;
     //     console.log(filePath);
@@ -198,6 +198,68 @@ exports.upload = async (req, res) => {
         const docData = new dbModels.Doc(criteria);
         await docData.save()
         res.send({ message: 'document uploaded' });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}
+
+
+
+/*********************************
+*   미팅이 삭제되면 관련된 pdf파일들 전부 삭제
+*   _id: meeting의 id
+********************************/
+exports.deleteMeetingPdfFile = async (req, res) => {
+
+    console.log(`
+--------------------------------------------------
+  User : ${req.query}
+  API  : Post my pdf
+  router.post(/deleteMeetingPdfFile', meetingContollder.deleteMeetingPdfFile);
+--------------------------------------------------`);
+    const dbModels = global.DB_MODELS;
+
+    console.log('[ meetingId ]', req.query._id)
+
+    try {
+
+        if (!req.query._id) {
+            return res.status(400).send('invalid meeting id1');
+        }
+        
+        const criteria = {
+            meetingId: req.query._id,
+        }
+
+        // meetingId에 해당하는 모든 doc 파일들
+        const deletePdfFile = await dbModels.Doc.find(criteria);
+
+        if (!deletePdfFile) {
+            return res.status(400).send('invalid meeting id2');
+        }
+
+        // 파일의 고유한 saveKey로 반복 삭제
+        for (let index = 0; index < deletePdfFile.length; index++) {
+            const element = deletePdfFile[index].saveKey;
+            const params = {
+                Bucket: "potatocs-meeting-pdf",
+                Key: element
+            }
+
+            // 그림을 그리는 화이트보드는 제외(s3에서 불러오는 화이트보드 파일)
+            if (element !== 'pdf/whiteboard.pdf') {
+                await s3.deleteObject(params, function (err, data) {
+                    if (err) console.log(err, err.stack);  // error
+                    else console.log('delete doc files');  // deleted
+                });
+            }
+
+            // DB에 업로드 된 파일들도 함께 삭제
+            await dbModels.Doc.deleteOne(criteria);
+        }
 
     } catch (err) {
         console.log(err);
