@@ -142,7 +142,8 @@ exports.document = async (req, res) => {
         console.log(key)
         res.attachment(key);
         var file = s3.getObject({
-            Bucket: "potatocs-meeting-pdf",
+            // Bucket: "potatocs-meeting-pdf",
+            Bucket: "test-potatocs",
             Key: key
         }).createReadStream()
             .on("error", error => {
@@ -245,7 +246,8 @@ exports.deleteMeetingPdfFile = async (req, res) => {
         for (let index = 0; index < deletePdfFile.length; index++) {
             const element = deletePdfFile[index].saveKey;
             const params = {
-                Bucket: "potatocs-meeting-pdf",
+                // Bucket: "potatocs-meeting-pdf",
+                Bucket: "test-potatocs",
                 Key: element
             }
 

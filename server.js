@@ -177,4 +177,4 @@ app.use(function(req, res) {
         => Redirect to 'index.html'
     ============================================`)
      res.sendFile(__dirname+'/client/index.html');
-    });
+});
