@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "test": "set NODE_ENV=development && nodemon server.js",
+    "prod": "set NODE_ENV=production && nodemon server.js",
+    "linux-test": "export NODE_ENV=development && nodemon server.js",
+    "linux-prod": "export NODE_ENV=production && nodemon server.js"
   },
   "author": "",
   "license": "ISC",

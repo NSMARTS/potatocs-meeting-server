@@ -43,6 +43,4 @@ config.webRTCInfo = {
 	meeting_disconnect: null,
 }
 
-config.s3Bucket = 'potatocs-meeting-pdf'
-
 module.exports = config;
