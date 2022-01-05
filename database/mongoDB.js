@@ -10,7 +10,7 @@ mongApp.appSetObjectId = function (app) {
 main().catch(err => console.log(err));
 
 async function main() {
-	await mongoose.connect(process.env.mongodb_uri, {
+	await mongoose.connect(process.env.MONGODB_URI, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	}).then( ()=> {
