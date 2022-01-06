@@ -1,6 +1,7 @@
 const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 const s3 = global.AWS_S3.s3;
+const bucket = global.AWS_S3.bucket;
 /**
  *    Meeting 정보 받아오기
  *  - TEST용도로 meeting이 없는 경우 meeting 생성
@@ -142,10 +143,9 @@ exports.document = async (req, res) => {
         console.log(key)
         res.attachment(key);
         var file = s3.getObject({
-            // Bucket: "potatocs-meeting-pdf",
-            Bucket: "test-potatocs",
-            Key: key
-        }).createReadStream()
+          Bucket: bucket,
+          Key: key
+          }).createReadStream()
             .on("error", error => {
             });
         file.pipe(res);
