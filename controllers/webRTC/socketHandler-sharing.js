@@ -8,8 +8,8 @@ let userRegister = new Register;
 
 const argv = minimst(process.argv.slice(2), {
   default: {
-      as_uri: 'http://15.165.65.162:3000',
-      ws_uri: 'ws://15.165.65.162:8888/kurento'
+      as_uri: process.env.KURENTO_AS_URI,
+      ws_uri: process.env.KURENTO_WS_URI
   }
 });
 

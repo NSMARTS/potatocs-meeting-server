@@ -1,39 +1,66 @@
-require('dotenv').config();
-
 const SocketIO = require("socket.io");
 const path = require('path')
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const mongApp = require('./database/mongoDB');
 
 const app = express();
+app.use(cors());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 
-var port = normalizePort(process.env.port || '3000');
+/* -----------------------------------------
+    npm run test 
+    npm run prod
+----------------------------------------- */ 
+if(process.env.NODE_ENV.trim() == 'production') {
+  require('dotenv').config({ path: path.join(__dirname, '/env/prod.env') });
+} else if(process.env.NODE_ENV.trim() == 'development') {
+  require('dotenv').config({ path: path.join(__dirname, '/env/dev.env') });
+}
+
+/* -----------------------------------------
+    PORT
+----------------------------------------- */ 
+var port = normalizePort(process.env.PORT);
 app.set('port', port);
 
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json())
+/* -----------------------------------------
+    DB
+----------------------------------------- */ 
+const mongApp = require('./database/mongoDB');
 
-/*****************
- * aws s3
-******************/
+/* -----------------------------------------
+    AWS
+----------------------------------------- */ 
 const AWS = require('aws-sdk');
+<<<<<<< HEAD
 const fs = require("fs"); 
 const config = require('./config/config');
   
 /*-----------------------------------------
 
  S3 관련 설정
+=======
+const fs = require("fs");
 
------------------------------------------------*/
-AWS.config.loadFromPath('./config/S3config.json');
-const s3 = new AWS.S3();
+/* -----------------------------------------
+    S3 CONFIG
+----------------------------------------- */ 
+// AWS.config.loadFromPath('./config/S3config.json');
+const s3 = new AWS.S3({
+	accessKeyId: process.env.AWS_ACCESS_KEY,
+	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	region: process.env.AWS_REGION
+});
+>>>>>>> 1683d00b91db034666a312606a25e8bc6a89c672
+
 global.AWS_S3 = {
 	s3,
-	bucket: config.s3Bucket
+	bucket: process.env.AWS_S3_BUCKET
 };
+
+const config = require('./config/config');
 
 // const options = {
 //     //key: fs.readFileSync('./../../../../etc/letsencrypt/live/pingppung.xyz/privkey.pem'),
@@ -76,11 +103,11 @@ const httpServer = http.createServer(app).listen(app.get('port'), () => {
     console.log(` 
     +---------------------------------------------+
     |                                                 
-    |      [Coop Server]
+    |      [ Potatocs Server ]
     |
-    |      - Version:`, process.env.version, `        
+    |      - Version:`,process.env.VERSION,`        
     |
-    |      - Mode: ${app.get('env')}
+    |      - Mode: ${process.env.MODE}
     |                                      
     |      - Server is running on port ${app.get('port')}
     |
