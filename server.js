@@ -166,10 +166,12 @@ const socketWebRTC = wsServer.of('/socketWebRTC');
 -----------------------------------------------*/
 const sharing = require('./controllers/webRTC/socketHandler-sharing.js')
 const drawing = require('./controllers/whiteBoard/socketHandler-drawing.js')
+const meetingChat = require('./controllers/webRTC/socketHandler-chat')
 
 socketWebRTC.on('connection', (socket) => {
     sharing(wsServer, socket, app )
     drawing(wsServer, socket, app)
+    meetingChat(wsServer, socket, app)
 });
 
 

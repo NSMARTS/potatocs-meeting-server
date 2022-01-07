@@ -30,31 +30,29 @@ let wsUrl = url.parse(argv.ws_uri).href;
 
 module.exports = function (wsServer, socket, app) {
 
-    const socketWebRTC = wsServer.of('/socketWebRTC');
 
-    // 룸에 참가.
+
+    const socketWebRTC = wsServer.of('/socketWebRTC');
+    // 룸에 참가.    
     socket.on('userInfo', (data) => {
-        console.log('[data]', data)
+
         roomname = data.roomName;
         username = data.userName;
-        console.log('roomName : ' + roomname)
-        console.log('userName : ' + username)
-
-        socket.join(roomname);
         socket.username = username;
-
-        joinRoom(socket, roomname, err => {
-            if (err) {
-                console.error('join Room error ' + err);
-            }
-        });
-
-    });
-
-    socket.on('sendChat', (data) => {
+        console.log(roomname)
 
 
     });
+
+
+
+
+    ////////// 채팅 //////////////// 
+    socket.on('sendChat', (chatData) => {
+        // 같은 room (meetingId로 판단)에 있는 사람에게 전송
+        socket.join(chatData.meetingId);
+        socketWebRTC.to(chatData.meetingId).emit("receiveChatData", chatData);
+    })
 
 
     socket.on("leaveRoom", (data) => {
@@ -78,7 +76,6 @@ module.exports = function (wsServer, socket, app) {
         }
     });
 
-
     socket.on("disconnect", () => {
         if (meeting_disconnect != null) {
             var data = {
@@ -93,69 +90,11 @@ module.exports = function (wsServer, socket, app) {
             meeting_disconnect = null;
         }
     });
+
+
+
+
 }
 
 
-
-let rooms = {};
-
-
-
-
-
-const Rooms = [];
-const RoomNumClient = [];
-
-
-function joinRoom(socket, roomName, callback) {
-
-    // get room 
-    getRoom(roomName, (error, room) => {
-        if (error) {
-            console.log('error');
-            callback(error);
-            return;
-        }
-        // join user to room
-        join(socket, room, (err, user) => {
-
-            console.log('join success : ' + socket.username);
-            if (err) {
-                callback(err);
-                return;
-            }
-            callback();
-        });
-    });
-}
-
-function getRoom(roomName, callback) {
-    let room = rooms[roomName];
-    if (room == null) {
-        console.log('create new room : ' + roomName);
-        getKurentoClient((error, kurentoClient) => {
-            if (error) {
-                return callback(error);
-            }
-            kurentoClient.create('MediaPipeline', (error, pipeline) => {
-                if (error) {
-                    return callback(error);
-                }
-                room = {
-                    name: roomName,
-                    pipeline: pipeline,
-                    participants: {},
-                    kurentoClient: kurentoClient
-                };
-
-                rooms[roomName] = room;
-                callback(null, room);
-            });
-        });
-
-    } else {
-        console.log('get existing room : ' + roomName);
-        callback(null, room);
-    }
-}
 
