@@ -34,14 +34,6 @@ const mongApp = require('./database/mongoDB');
     AWS
 ----------------------------------------- */ 
 const AWS = require('aws-sdk');
-<<<<<<< HEAD
-const fs = require("fs"); 
-const config = require('./config/config');
-  
-/*-----------------------------------------
-
- S3 관련 설정
-=======
 const fs = require("fs");
 
 /* -----------------------------------------
@@ -53,7 +45,6 @@ const s3 = new AWS.S3({
 	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 	region: process.env.AWS_REGION
 });
->>>>>>> 1683d00b91db034666a312606a25e8bc6a89c672
 
 global.AWS_S3 = {
 	s3,

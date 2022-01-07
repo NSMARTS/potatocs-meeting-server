@@ -206,3 +206,52 @@ exports.upload = async (req, res) => {
     }
 
 }
+
+exports.deleteMeetingPdfFile = async (req, res) => {
+
+    console.log(`
+--------------------------------------------------
+  User : ${req.query._id}
+  API  : Delete my pdf
+  router.post(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
+--------------------------------------------------`);
+    const dbModels = global.DB_MODELS;
+
+    try {
+
+        if (!req.query._id) {
+            return res.status(400).send('invalid meeting id1');
+        }
+
+        result = await dbModels.Doc.findOne({ _id: req.query._id },{_id: false , saveKey:true, meetingId:true});
+
+        if (!result) {
+            return res.status(400).send('invalid meeting id2');
+        }
+        // console.log(req.files[0])
+        const params = {
+			Bucket: bucket,
+			Key:  result.saveKey
+		};
+		s3.deleteObject(params,function(err, data){
+			if(err) console.log(err, err.stack);
+			else console.log('s3 delete Success');
+		})
+		await dbModels.Doc.findOneAndDelete(
+			{
+				_id: req.query._id
+			}
+		)
+
+        return res.status(200).send({
+			message: 'upload file delete',
+            meetingId: result.meetingId,
+		});
+		
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}

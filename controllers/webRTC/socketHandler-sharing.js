@@ -22,7 +22,6 @@ var bandwidth;
 
 let meeting_disconnect = null;
 
-
 let asUrl = url.parse(argv.as_uri);
 //let port = asUrl.port;
 let wsUrl = url.parse(argv.ws_uri).href;
