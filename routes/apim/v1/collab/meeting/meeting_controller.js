@@ -151,3 +151,51 @@ exports.getChat = async (req, res) => {
 	}
 
 }
+
+
+/*
+	Delete a chat
+*/
+exports.deleteChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a chat
+  router.delete('/deleteChat', MeetingContollder.deleteChat);
+--------------------------------------------------`);
+	console.log('[[deleteChat]] >>>>>> ', req.query.chatId)
+
+	const dbModels = global.DB_MODELS;
+
+	try {
+
+        if (!req.query.chatId) {
+            return res.status(400).send('invalid meeting id1');
+        }
+
+        const criteria = {
+            _id: req.query.chatId,
+        }
+
+        // meetingId에 해당하는 모든 doc 파일들
+        const deleteChat = await dbModels.MeetingChat.findOne(criteria);
+
+		console.log(deleteChat)
+
+        if (!deleteChat) {
+            return res.status(400).send('invalid meeting id2');
+        }
+
+        
+		// DB에 업로드 된 파일들도 함께 삭제
+		await dbModels.MeetingChat.deleteOne(criteria);
+        
+		return res.status(200).send({
+			message: 'deleted'
+		})
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}

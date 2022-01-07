@@ -18,6 +18,7 @@ router.get('/getMeetingData', meetingController.getMeetingData)
 router.get('/getUserData/:userId', meetingController.getUserData)
 router.post('/createChat', meetingController.createChat)
 router.get('/getChat', meetingController.getChat)
+router.delete('/deleteChat', meetingController.deleteChat)
 
 
 module.exports = router;

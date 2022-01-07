@@ -55,6 +55,12 @@ module.exports = function (wsServer, socket, app) {
     })
 
 
+    // 같은 room에 있는 모든 사람들 채팅 삭제
+    socket.on('deleteChat', (data) => {
+        socket.broadcast.to(data).emit("refreshChat");
+    })
+
+
     socket.on("leaveRoom", (data) => {
         socket.leave(data.roomname);
         leaveRoom(socket, data, err => {
