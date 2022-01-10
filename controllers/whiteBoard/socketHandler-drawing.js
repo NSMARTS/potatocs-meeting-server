@@ -45,6 +45,30 @@ module.exports = function (wsServer, socket, app) {
 
 
 
+    /*-------------------------------------------
+        doc 전환 하는 경우 sync
+     ---------------------------------------------*/
+    socket.on('sync:doc', (data) => {
+        console.log('page to sync: ', data.docId);
+        socket.broadcast.to(data.meetingId).emit('sync:docChange', data.docId);       
+    });
+    
+    /*-------------------------------------------
+        page 전환 하는 경우 sync
+     ---------------------------------------------*/
+    // socket.on('sync:page', (data) => {
+    //     console.log('page to sync: ', data.pageNum);
+    //     socket.broadcast.to(data.meetingId).emit('sync:page', data.pageNum);       
+    // });
+
+    /*-------------------------------------------
+        doc. List 전환 하는 경우 sync
+     ---------------------------------------------*/
+     socket.on('sync:FileList', (data) => {
+        console.log('back to FileList sync: ');
+        socket.broadcast.to(data.meetingId).emit('sync:backToFileList');       
+    });
+
     socket.on('disconnect', () => {
         console.log('a user disconnected!');
     });
