@@ -51,12 +51,14 @@ module.exports = function (wsServer, socket, app) {
     socket.on('sendChat', (chatData) => {
         // 같은 room (meetingId로 판단)에 있는 사람에게 전송
         socket.join(chatData.meetingId);
+        // 자기 자신 포함 같은 room (meetingId로 판단)에 있는 사람들
         socketWebRTC.to(chatData.meetingId).emit("receiveChatData", chatData);
     })
 
 
     // 같은 room에 있는 모든 사람들 채팅 삭제
     socket.on('deleteChat', (data) => {
+        // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들
         socket.broadcast.to(data).emit("refreshChat");
     })
 

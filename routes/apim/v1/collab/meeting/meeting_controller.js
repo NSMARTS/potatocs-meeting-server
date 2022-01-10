@@ -162,7 +162,7 @@ exports.deleteChat = async (req, res) => {
   API  : Get a chat
   router.delete('/deleteChat', MeetingContollder.deleteChat);
 --------------------------------------------------`);
-	console.log('[[deleteChat]] >>>>>> ', req.query.chatId)
+	console.log('[[deleteChat meetingId]] >>>>>> ', req.query.chatId)
 
 	const dbModels = global.DB_MODELS;
 
@@ -176,7 +176,7 @@ exports.deleteChat = async (req, res) => {
             _id: req.query.chatId,
         }
 
-        // meetingId에 해당하는 모든 doc 파일들
+        // meetingId에 해당하는 채팅 query
         const deleteChat = await dbModels.MeetingChat.findOne(criteria);
 
 		console.log(deleteChat)
@@ -186,11 +186,59 @@ exports.deleteChat = async (req, res) => {
         }
 
         
-		// DB에 업로드 된 파일들도 함께 삭제
+		// DB에 업로드 된 해당 채팅도 함께 삭제
 		await dbModels.MeetingChat.deleteOne(criteria);
         
 		return res.status(200).send({
 			message: 'deleted'
+		})
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}
+
+
+/*
+	Delete All of chat
+*/
+exports.deleteAllOfChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Delete All of chat
+  router.delete('/deleteAllOfChat', MeetingContollder.deleteAllOfChat);
+--------------------------------------------------`);
+	console.log('[[deleteAllOfChat meetingId]] >>>>>> ', req.query._id)
+
+	const dbModels = global.DB_MODELS;
+
+	try {
+
+        if (!req.query._id) {
+            return res.status(400).send('invalid meeting id1');
+        }
+
+        const criteria = {
+            meetingId: req.query._id,
+        }
+
+        // meetingId에 해당하는 모든 채팅들 query
+        const deleteChat = await dbModels.MeetingChat.find(criteria);
+
+		console.log(deleteChat)
+
+        if (!deleteChat) {
+            return res.status(400).send('invalid meeting id2');
+        }
+
+        
+		// DB에 업로드 된 모든 채팅들 삭제
+		await dbModels.MeetingChat.deleteMany(criteria);
+        
+		return res.status(200).send({
+			message: 'deleted All'
 		})
 
     } catch (err) {
