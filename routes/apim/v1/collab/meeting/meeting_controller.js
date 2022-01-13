@@ -135,8 +135,10 @@ exports.getChat = async (req, res) => {
 	
 		// 원하는 값만 query 하기 공백으로 구분
 		const MeetingChat = await dbModels.MeetingChat.find(criteria).select('userId chatMember createdAt chatContent');
-		console.log("[[ getChat ]] >>>>", MeetingChat)
 	
+		if (!MeetingChat) {
+            return res.status(400).send('invalid meeting chat');
+        }
 
 		return res.status(200).send(
 			MeetingChat
@@ -182,7 +184,7 @@ exports.deleteChat = async (req, res) => {
 		console.log(deleteChat)
 
         if (!deleteChat) {
-            return res.status(400).send('invalid meeting id2');
+            return res.status(400).send('invalid meeting chat');
         }
 
         
@@ -230,7 +232,7 @@ exports.deleteAllOfChat = async (req, res) => {
 		console.log(deleteChat)
 
         if (!deleteChat) {
-            return res.status(400).send('invalid meeting id2');
+            return res.status(400).send('invalid meeting chat');
         }
 
         

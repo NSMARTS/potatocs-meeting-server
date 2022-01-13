@@ -2,11 +2,15 @@ module.exports = class Register {
     constructor() {
         this.usersByName = {};
         this.userSessionIds = {};
+        this.usersByUserId = {};
     }
 
 
     register(user) {
+        
         this.usersByName[user.name] = user;
+        this.usersByUserId[user.userId] = user;
+        console.log('register userId :' , this.usersByUserId[user.userId] )
         this.userSessionIds[user.id] = user;
         // console.log('this.usersByName')
         // console.log(this.usersByName)
@@ -31,6 +35,10 @@ module.exports = class Register {
 
     getByName(name) {
         return this.usersByName[name];
+    }
+
+    getByUserId(userId) {
+        return this.usersByUserId[userId];
     }
 
     getById(id) {

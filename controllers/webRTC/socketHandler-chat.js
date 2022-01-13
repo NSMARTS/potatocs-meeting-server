@@ -35,13 +35,10 @@ module.exports = function (wsServer, socket, app) {
     const socketWebRTC = wsServer.of('/socketWebRTC');
     // 룸에 참가.    
     socket.on('userInfo', (data) => {
-
         roomname = data.roomName;
         username = data.userName;
         socket.username = username;
         console.log(roomname)
-
-
     });
 
 

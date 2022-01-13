@@ -36,7 +36,7 @@ exports.meetingInfo = async (req, res) => {
 
         let meetingInfo = await dbModels.Meeting.findOne(criteria).populate('enlistedMembers')
 
-        console.log(meetingInfo)
+        console.log('[[meetingInfo]]', meetingInfo)
 
 
 
