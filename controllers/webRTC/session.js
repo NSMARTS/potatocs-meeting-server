@@ -1,10 +1,11 @@
 module.exports = class Session {
 
-    constructor(socket, userName, roomName) {
+    constructor(socket, userName, roomName, userId) {
         this.id = socket.id;
         this.socket = socket;
         this.name = userName;
         this.roomName = roomName;
+        this.userId = userId;
         // this.bandwidth = bandwidth;
         this.bandwidth = 500;
         this.outgoingMedia = null;
@@ -12,9 +13,12 @@ module.exports = class Session {
         this.iceCandidateQueue = {};
     }
 
+
+    // data.sender === this.userId
+    // 잘못되면 이거  data.sender === this.name로 바꿔라
     addIceCandidate(data, candidate) {
         // self
-        if (data.sender === this.name) {
+        if (data.sender === this.userId) {
             // have outgoing media.
             if (this.outgoingMedia) {
                 // console.log(' add candidate to self : ' + data.sender);
@@ -67,6 +71,9 @@ module.exports = class Session {
     }
     setBandWidth(bandwidth) {
         this.bandwidth = bandwidth;
+    }
+    setUserId(userId) {
+        this.userId = userId;
     }
 
 }

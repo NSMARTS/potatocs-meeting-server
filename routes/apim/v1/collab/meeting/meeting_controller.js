@@ -73,180 +73,179 @@ exports.getUserData = async (req, res) => {
 	}
 
 }
-// /*
-// 	Create a meeting
-// */
-// exports.createMeeting = async (req, res) => {
-// 	console.log(`
-// --------------------------------------------------
-//   User : ${req.decoded._id}
-//   API  : Create a folder
-//   router.post('/create-meeting', MeetingContollder.createMeeting);
-
-//   meetingTitle : ${req.body.meetingTitle}
-//   meetingBrief : ${req.body.meetingBrief}
-// --------------------------------------------------`);
-// 	console.log('[[createMeeting]] >>>>>> ', req.body)
-
-// 	const dbModels = global.DB_MODELS;
-
-// 	try {
-// 		const criteria = {
-// 			members: [],
-// 			manager: req.decoded._id,
-// 			enlistedMembers: [],
-// 			meetingTitle: req.body.meetingTitle,
-// 			docId: req.body.docId,
-// 			spaceTime : req.body.spaceTime
-// 		}
-
-// 		const Meeting = dbModels.Meeting(criteria);
-// 		console.log("[[ Meeting ]] >>>>", Meeting)
-// 		await Meeting.save();
-
-// 		return res.status(200).send({
-// 			message: 'created',
-// 		})
-
-// 	} catch (err) {
-
-// 		return res.status(500).send({
-// 			message: 'creatintg a meeting had an error'
-// 		});
-
-// 	}
-
-// }
-
-// exports.updateMeeting = async (req, res) => {
-
-// 	console.log(`
-// --------------------------------------------------
-//   User : ${req.decoded._id}
-//   API  : Get my Meeting
-//   router.get(/update-meeting', meetingContollder.updateMeeting);
-// --------------------------------------------------`);
-// 	const dbModels = global.DB_MODELS;
-// 	console.log(req.query)
-
-// 	try {	
-
-// 		const criteria = {
-// 			docId: req.query.docId,
-// 			spaceTime : req.query.spaceTime
-// 		}
-
-// 		const meetingData = await dbModels.Meeting.find(criteria);
-
-// 		console.log('meetingData >>> ', meetingData)
-
-// 		return res.status(200).send({
-// 			message: 'updated',
-// 			meetingData,
-
-// 		})
 
 
-// 	} catch (err) {
+/*
+	Create a chat
+*/
+exports.createChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Create a chat
+  router.post('/createChat', MeetingContollder.createChat);
+--------------------------------------------------`);
+	// console.log('[[createChat]] >>>>>> ', req.body)
 
-// 		console.log('[ ERROR ]', err);
-// 		res.status(500).send({
-// 			message: 'loadUpateMenu Error'
-// 		})
-// 	}
+	const dbModels = global.DB_MODELS;
 
-// }
+	try {
+		const criteria = {
+			meetingId: req.body.meetingId,
+			userId: req.body.userId,
+			chatMember: req.body.chatMember,
+			chatContent: req.body.chatContent
+		}
 
-// // 회의 참가
-// exports.joinMeeting = async (req, res) => {
+		const Meeting = dbModels.MeetingChat(criteria);
+		console.log("[[ createChat ]] >>>>", Meeting)
+		await Meeting.save();
 
-// 	console.log(`
-// --------------------------------------------------
-//   User : ${req.decoded._id}
-//   API  : Get my Meeting
-//   router.post(/join-meeting', meetingContollder.joinMeeting);
-// --------------------------------------------------`);
-// 	const dbModels = global.DB_MODELS;
+		return res.status(200).send(
+			Meeting
+		)
 
-// 	try {	
-// 		// Find the document that describes "_id"
-// 		const criteria = {
-// 			_id: req.body._id, // 회의 id
-// 		}
+	} catch (err) {
 
-// 		// Set some fields in that document
-// 		const update = {
-// 			members: req.decoded._id
-// 		}
+		return res.status(500).send({
+			message: 'creatintg a meeting chat had an error'
+		});
 
-// 		// Return the updated document instead of the original document
-// 		const options = { returnNewDocument: true };
+	}
 
-// 		const meetingData = await dbModels.Meeting.findOneAndUpdate(criteria, {$addToSet: update}, options)
-// 		.then(updatedDocument => {
-// 			if(updatedDocument) {
-// 			  console.log(`[[ Successfully updated document ]]: ${updatedDocument}.`)
-// 			} else {
-// 			  console.log("No document matches the provided query.")
-// 			}
-// 			return updatedDocument
-// 		  })
-// 		  .catch(err => console.error(`Failed to find and update document: ${err}`))
-
-// 		//   console.log(meetingData)
-
-// 		return res.status(200).send({
-// 			message: 'join',
-// 			meetingData,
-// 		})
+}
 
 
-// 	} catch (err) {
+/*
+	Get a chat
+*/
+exports.getChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a chat
+  router.get('/getChat', MeetingContollder.getChat);
+--------------------------------------------------`);
+	console.log('[[getChat]] >>>>>> ', req.query.meetingId)
 
-// 		console.log('[ ERROR ]', err);
-// 		res.status(500).send({
-// 			message: 'joinMeeting Error'
-// 		})
-// 	}
+	const dbModels = global.DB_MODELS;
 
-// }
+	try {
+		const criteria = {
+			meetingId: req.query.meetingId,
+		}
+	
+		// 원하는 값만 query 하기 공백으로 구분
+		const MeetingChat = await dbModels.MeetingChat.find(criteria).select('userId chatMember createdAt chatContent');
+	
+		if (!MeetingChat) {
+            return res.status(400).send('invalid meeting chat');
+        }
 
+		return res.status(200).send(
+			MeetingChat
+		)
 
-// exports.getJoinMeeting = async (req, res) => {
+	} catch (err) {
 
-// 	console.log(`
-// --------------------------------------------------
-//   User : ${req.decoded._id}
-//   API  : Get my Meeting
-//   router.get(/get-join-meeting', meetingContollder.getJoinMeeting);
-// --------------------------------------------------`);
-// 	const dbModels = global.DB_MODELS;
+		return res.status(500).send({
+			message: 'creatintg a meeting chat had an error'
+		});
 
-// 	console.log(req.query)
+	}
 
-// 	try {	
-
-// 		const criteria = {
-// 			members: req.decoded._id,
-// 			_id: req.query._id
-// 		}
-
-// 		const meetingData = await dbModels.Meeting.find(criteria);
-// 		console.log('[[ getJoinMeeting ]]', meetingData)
-
-// 		return res.status(200).send({
-// 			message: 'getJoinMeeting',
-// 			meetingData,
-
-// 		})
+}
 
 
-// 	} catch (err) {
+/*
+	Delete a chat
+*/
+exports.deleteChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a chat
+  router.delete('/deleteChat', MeetingContollder.deleteChat);
+--------------------------------------------------`);
+	console.log('[[deleteChat meetingId]] >>>>>> ', req.query.chatId)
 
-// 		console.log('[ ERROR ]', err);
-// 		res.status(500).send({
-// 			message: 'getJoinMeeting Error'
-// 		})
-// 	}
+	const dbModels = global.DB_MODELS;
 
-// }
+	try {
+
+        if (!req.query.chatId) {
+            return res.status(400).send('invalid meeting id1');
+        }
+
+        const criteria = {
+            _id: req.query.chatId,
+        }
+
+        // meetingId에 해당하는 채팅 query
+        const deleteChat = await dbModels.MeetingChat.findOne(criteria);
+
+		console.log(deleteChat)
+
+        if (!deleteChat) {
+            return res.status(400).send('invalid meeting chat');
+        }
+
+        
+		// DB에 업로드 된 해당 채팅도 함께 삭제
+		await dbModels.MeetingChat.deleteOne(criteria);
+        
+		return res.status(200).send({
+			message: 'deleted'
+		})
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}
+
+
+/*
+	Delete All of chat
+*/
+exports.deleteAllOfChat = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Delete All of chat
+  router.delete('/deleteAllOfChat', MeetingContollder.deleteAllOfChat);
+--------------------------------------------------`);
+	console.log('[[deleteAllOfChat meetingId]] >>>>>> ', req.query._id)
+
+	const dbModels = global.DB_MODELS;
+
+	try {
+
+        if (!req.query._id) {
+            return res.status(400).send('invalid meeting id1');
+        }
+
+        const criteria = {
+            meetingId: req.query._id,
+        }
+
+        // meetingId에 해당하는 모든 채팅들 query
+        const deleteChat = await dbModels.MeetingChat.find(criteria);
+
+		console.log(deleteChat)
+
+        if (!deleteChat) {
+            return res.status(400).send('invalid meeting chat');
+        }
+
+        
+		// DB에 업로드 된 모든 채팅들 삭제
+		await dbModels.MeetingChat.deleteMany(criteria);
+        
+		return res.status(200).send({
+			message: 'deleted All'
+		})
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
+
+}

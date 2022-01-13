@@ -66,6 +66,7 @@ router.get('/document/:_id', whiteBoardController.document);
 /* 파일 업로드 */
 router.post('/upload/:meetingId', upload.any(), whiteBoardController.upload);
 
-
+/* 미팅 삭제 시 s3에 있는 파일 삭제 */
+router.delete('/deleteMeetingPdfFile', whiteBoardController.deleteMeetingPdfFile)
 
 module.exports = router;
