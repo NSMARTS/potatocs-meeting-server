@@ -254,13 +254,13 @@ exports.deleteAllOfChat = async (req, res) => {
 /*
 	Get a role
 */
-exports.getRole = async (req, res) => {
+exports.getParticipantState = async (req, res) => {
 	console.log(`
 --------------------------------------------------
   API  : Get a role
-  router.get('/getRole', MeetingContollder.getRole);
+  router.get('/getParticipantState', MeetingContollder.getParticipantState);
 --------------------------------------------------`);
-	console.log('[[getRole]] >>>>>> ', req.query.meetingId)
+	console.log('[[getParticipantState]] >>>>>> ', req.query.meetingId)
 
 	const dbModels = global.DB_MODELS;
 
@@ -270,7 +270,7 @@ exports.getRole = async (req, res) => {
 		}
 	
 		const currentMembers = await dbModels.Meeting.find(criteria).select('currentMembers');
-		console.log('[[ getRole ]]', currentMembers)
+		console.log('[[ getParticipantState ]]', currentMembers)
 		console.log('-------------------------------------------')
 
 	
@@ -395,6 +395,59 @@ exports.getOnlineFalse = async (req, res) => {
 
 		return res.status(200).send(
 			getOnlineFalse
+		)
+
+	} catch (err) {
+
+		return res.status(500).send({
+			message: 'get a meeting role had an error'
+		});
+
+	}
+
+}
+
+
+
+/*
+	Update a Role
+*/
+exports.getRoleUpdate = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a role
+  router.get('/getRoleUpdate', MeetingContollder.getRoleUpdate);
+--------------------------------------------------`);
+	console.log('[[getRoleUpdate]] >>>>>> ', req.query)
+
+	const dbModels = global.DB_MODELS;
+
+	try {
+		
+		const getRoleUpdate = await dbModels.Meeting.findOneAndUpdate(
+			{
+				_id: req.query.meetingId, // meetingId
+				'currentMembers.member_id' : req.query.userId, // userId
+			},
+			{
+				$set: {
+					'currentMembers.$.role' : req.query.role
+				}
+			},
+			{
+				new: true
+			}
+		)
+		console.log('[[ getRoleUpdate ]]', getRoleUpdate)
+		console.log('-------------------------------------------')
+
+	
+		if (!getRoleUpdate) {
+            return res.status(400).send('invalid meeting online');
+        }
+
+		return res.status(200).send(
+			getRoleUpdate
 		)
 
 	} catch (err) {
