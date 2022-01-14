@@ -249,3 +249,160 @@ exports.deleteAllOfChat = async (req, res) => {
     }
 
 }
+
+
+/*
+	Get a role
+*/
+exports.getRole = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a role
+  router.get('/getRole', MeetingContollder.getRole);
+--------------------------------------------------`);
+	console.log('[[getRole]] >>>>>> ', req.query.meetingId)
+
+	const dbModels = global.DB_MODELS;
+
+	try {
+		const criteria = {
+			_id: req.query.meetingId,
+		}
+	
+		const currentMembers = await dbModels.Meeting.find(criteria).select('currentMembers');
+		console.log('[[ getRole ]]', currentMembers)
+		console.log('-------------------------------------------')
+
+	
+		if (!currentMembers) {
+            return res.status(400).send('invalid meeting role');
+        }
+
+		return res.status(200).send(
+			currentMembers
+		)
+
+	} catch (err) {
+
+		return res.status(500).send({
+			message: 'get a meeting role had an error'
+		});
+
+	}
+
+}
+
+
+/*
+	Get a onLine
+*/
+exports.getOnlineTrue = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a role
+  router.get('/getOnlineTrue', MeetingContollder.getOnlineTrue);
+--------------------------------------------------`);
+	console.log('[[getOnlineTrue]] >>>>>> ', req.query)
+
+	/**
+	 * req.query = {
+	 * 	 meetingId: '61dfc310f3aedb66a1786e8e',
+  		 userId: '61d3f9c13b83fffca344bf58'
+	 * }
+	 */
+	const dbModels = global.DB_MODELS;
+
+	try {
+		
+		const getOnlineTrue = await dbModels.Meeting.findOneAndUpdate(
+			{
+				_id: req.query.meetingId, // meetingId
+				'currentMembers.member_id' : req.query.userId, // userId
+			},
+			{
+				$set: {
+					'currentMembers.$.online' : true
+				}
+			},
+			{
+				new: true
+			}
+		)
+		console.log('[[ getOnlineTrue ]]', getOnlineTrue)
+		console.log('-------------------------------------------')
+
+	
+		if (!getOnlineTrue) {
+            return res.status(400).send('invalid meeting online');
+        }
+
+		return res.status(200).send(
+			getOnlineTrue
+		)
+
+	} catch (err) {
+
+		return res.status(500).send({
+			message: 'get a meeting role had an error'
+		});
+
+	}
+
+}
+
+/*
+	Get a onLine
+*/
+exports.getOnlineFalse = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a role
+  router.get('/getOnlineFalse', MeetingContollder.getOnlineFalse);
+--------------------------------------------------`);
+	console.log('[[getOnlineFalse]] >>>>>> ', req.query)
+
+	/**
+	 * req.query = {
+	 * 	 meetingId: '61dfc310f3aedb66a1786e8e',
+  		 userId: '61d3f9c13b83fffca344bf58'
+	 * }
+	 */
+	const dbModels = global.DB_MODELS;
+
+	try {
+		
+		const getOnlineFalse = await dbModels.Meeting.findOneAndUpdate(
+			{
+				_id: req.query.meetingId, // meetingId
+				'currentMembers.member_id' : req.query.userId, // userId
+			},
+			{
+				$set: {
+					'currentMembers.$.online' : false
+				}
+			},
+			{
+				new: true
+			}
+		)
+		console.log('[[ getOnlineFalse ]]', getOnlineFalse)
+		console.log('-------------------------------------------')
+
+	
+		if (!getOnlineFalse) {
+            return res.status(400).send('invalid meeting online');
+        }
+
+		return res.status(200).send(
+			getOnlineFalse
+		)
+
+	} catch (err) {
+
+		return res.status(500).send({
+			message: 'get a meeting role had an error'
+		});
+
+	}
+
+}

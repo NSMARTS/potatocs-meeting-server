@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 
 const meetingScehma = mongoose.Schema(
 	{
-        _id: mongoose.Schema.Types.ObjectId,
-        
         manager: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Member',
@@ -14,10 +12,21 @@ const meetingScehma = mongoose.Schema(
                 ref: 'Member',
             }
         ],
+
+        // 실시간 미팅에서 쓰이는 currentMembers
         currentMembers: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Member',
+                _id : false, // 추가 : array 내에 object ID 생성 안함
+                member_id:{
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Member',
+                },
+                role: {
+                    type: String
+                },
+                online: {
+                    type: Boolean
+                }
             }
         ],
         docId: {
@@ -29,6 +38,11 @@ const meetingScehma = mongoose.Schema(
         },
         isDone: {
             type: Boolean
+        },
+
+        // 회의가 pending, open ,close인지 상태를 보여준다.
+        status: {
+            type: String
         },
         start_date: {
             type: Date
@@ -47,42 +61,5 @@ const meetingScehma = mongoose.Schema(
 const Meeting = mongoose.model('Meeting', meetingScehma);
 
 module.exports = Meeting;
-
-
-// const mongoose = require('mongoose');
-
-// const meetingSchema = mongoose.Schema(
-// 	{
-// 		manager: { 
-//             type: mongoose.Schema.Types.ObjectId, 
-//             ref: 'Member',
-//         },
-//         enlistedMembers: [
-//             {
-//                 type: mongoose.Schema.Types.ObjectId,
-//                 ref: 'Member',
-//             }
-//         ],
-//         meetingTitle : {
-//             type: String,
-//             required: true
-//         },
-//         docId : {
-//             type: String,
-//             // ref:, 'Member',
-//         },
-//         spaceTime : {
-//             type: String,
-//         }
-// 	},
-// 	{
-// 		timestamps: true
-// 	}
-// );
-
-
-// const Meeting = mongoose.model('Meeting', meetingSchema);
-
-// module.exports = Meeting;
 
 
