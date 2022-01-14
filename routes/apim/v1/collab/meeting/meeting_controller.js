@@ -361,16 +361,12 @@ exports.getOnlineFalse = async (req, res) => {
 --------------------------------------------------`);
 	console.log('[[getOnlineFalse]] >>>>>> ', req.query)
 
-	/**
-	 * req.query = {
-	 * 	 meetingId: '61dfc310f3aedb66a1786e8e',
-  		 userId: '61d3f9c13b83fffca344bf58'
-	 * }
-	 */
 	const dbModels = global.DB_MODELS;
 
 	try {
 		
+		// meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
+		// $는 배열의 몇 번째인지 index와 같은 역할
 		const getOnlineFalse = await dbModels.Meeting.findOneAndUpdate(
 			{
 				_id: req.query.meetingId, // meetingId
@@ -386,7 +382,6 @@ exports.getOnlineFalse = async (req, res) => {
 			}
 		)
 		console.log('[[ getOnlineFalse ]]', getOnlineFalse)
-		console.log('-------------------------------------------')
 
 	
 		if (!getOnlineFalse) {
@@ -424,6 +419,8 @@ exports.getRoleUpdate = async (req, res) => {
 
 	try {
 		
+		// meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
+		// $는 배열의 몇 번째인지 index와 같은 역할
 		const getRoleUpdate = await dbModels.Meeting.findOneAndUpdate(
 			{
 				_id: req.query.meetingId, // meetingId
@@ -439,8 +436,6 @@ exports.getRoleUpdate = async (req, res) => {
 			}
 		)
 		console.log('[[ getRoleUpdate ]]', getRoleUpdate)
-		console.log('-------------------------------------------')
-
 	
 		if (!getRoleUpdate) {
             return res.status(400).send('invalid meeting online');
