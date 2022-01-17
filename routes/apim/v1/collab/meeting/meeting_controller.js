@@ -469,40 +469,33 @@ exports.getMeetingStatus = async (req, res) => {
 
 	const dbModels = global.DB_MODELS;
 
-	// try {
+	try {
+
+		const criteria = {
+			_id: req.query.meetingId,
+		}
 		
-	// 	// meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
-	// 	// $는 배열의 몇 번째인지 index와 같은 역할
-	// 	const getMeetingStatus = await dbModels.Meeting.findOneAndUpdate(
-	// 		{
-	// 			_id: req.query.meetingId, // meetingId
-	// 			'currentMembers.member_id' : req.query.userId, // userId
-	// 		},
-	// 		{
-	// 			$set: {
-	// 				'currentMembers.$.role' : req.query.role
-	// 			}
-	// 		},
-	// 		{
-	// 			new: true
-	// 		}
-	// 	)
-	// 	console.log('[[ getMeetingStatus ]]', getMeetingStatus)
+		// meetingId를 이용하여 status 값 확인
+		const getMeetingStatus = await dbModels.Meeting.findOne(criteria).select('status');
+		console.log('[[ getMeetingStatus ]]', getMeetingStatus)
 	
-	// 	if (!getMeetingStatus) {
-    //         return res.status(400).send('invalid getMeetingStatus');
-    //     }
+		if (!getMeetingStatus) {
+            return res.status(400).send('invalid getMeetingStatus');
+        }
 
-	// 	return res.status(200).send(
-	// 		getMeetingStatus
-	// 	)
+		const getStatus = {
+			_id : getMeetingStatus._id,
+			status : getMeetingStatus.status
+		}
 
-	// } catch (err) {
+		return res.status(200).send(getStatus)
 
-	// 	return res.status(500).send({
-	// 		message: 'get a getMeetingStatushad an error'
-	// 	});
+	} catch (err) {
 
-	// }
+		return res.status(500).send({
+			message: 'get a getMeetingStatushad an error'
+		});
+
+	}
 
 }
