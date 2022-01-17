@@ -21,11 +21,13 @@ router.post('/createChat', meetingController.createChat)
 router.get('/getChat', meetingController.getChat)
 router.delete('/deleteChat', meetingController.deleteChat)
 router.delete('/deleteAllOfChat', meetingController.deleteAllOfChat)
-// realTime State
+// realTime members state
 router.get('/getParticipantState', meetingController.getParticipantState)
 router.get('/getOnlineTrue', meetingController.getOnlineTrue)
 router.get('/getOnlineFalse', meetingController.getOnlineFalse)
-// realTime Role
+// realTime members role
 router.get('/getRoleUpdate', meetingController.getRoleUpdate)
+// realTime meeting status
+router.get('/getMeetingStatus', meetingController.getMeetingStatus)
 
 module.exports = router;

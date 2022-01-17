@@ -454,3 +454,55 @@ exports.getRoleUpdate = async (req, res) => {
 	}
 
 }
+
+
+/*
+	Update a meeting status
+*/
+exports.getMeetingStatus = async (req, res) => {
+	console.log(`
+--------------------------------------------------
+  API  : Get a meeting status
+  router.get('/getMeetingStatus', MeetingContollder.getMeetingStatus);
+--------------------------------------------------`);
+	console.log('[[getMeetingStatus]] >>>>>> ', req.query)
+
+	const dbModels = global.DB_MODELS;
+
+	// try {
+		
+	// 	// meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
+	// 	// $는 배열의 몇 번째인지 index와 같은 역할
+	// 	const getMeetingStatus = await dbModels.Meeting.findOneAndUpdate(
+	// 		{
+	// 			_id: req.query.meetingId, // meetingId
+	// 			'currentMembers.member_id' : req.query.userId, // userId
+	// 		},
+	// 		{
+	// 			$set: {
+	// 				'currentMembers.$.role' : req.query.role
+	// 			}
+	// 		},
+	// 		{
+	// 			new: true
+	// 		}
+	// 	)
+	// 	console.log('[[ getMeetingStatus ]]', getMeetingStatus)
+	
+	// 	if (!getMeetingStatus) {
+    //         return res.status(400).send('invalid getMeetingStatus');
+    //     }
+
+	// 	return res.status(200).send(
+	// 		getMeetingStatus
+	// 	)
+
+	// } catch (err) {
+
+	// 	return res.status(500).send({
+	// 		message: 'get a getMeetingStatushad an error'
+	// 	});
+
+	// }
+
+}
