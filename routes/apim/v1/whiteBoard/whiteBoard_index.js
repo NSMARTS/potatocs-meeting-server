@@ -69,5 +69,7 @@ router.post('/upload/:meetingId', upload.any(), whiteBoardController.upload);
 /* 파일 삭제 */
 router.delete('/deleteMeetingPdfFile', whiteBoardController.deleteMeetingPdfFile);
 
+/* 드로잉 이벤트 삭제 */
+router.delete('/deleteDrawingEvent', whiteBoardController.deleteDrawingEvent);
 
 module.exports = router;
