@@ -35,6 +35,9 @@ function createSchema() {
 	dbModels.Drawing = require('../models/Drawing');
 	// dbModels.whiteBoardMeeting = require('../models/Meeting');
 
+	// realTime
+	dbModels.MeetingChat = require('../models/meetingChat_schema');
+
 	global.DB_MODELS = dbModels;
 }
 
