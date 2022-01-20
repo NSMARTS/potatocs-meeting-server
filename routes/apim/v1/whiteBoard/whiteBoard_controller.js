@@ -17,7 +17,7 @@ exports.meetingInfo = async (req, res) => {
 --------------------------------------------------`);
     const dbModels = global.DB_MODELS;
     console.log(dbModels)
- 
+
     // const criteria = {
     //     _id: new mongoose.Types.ObjectId(),
     //     meetingName: 'testRoom',
@@ -29,17 +29,17 @@ exports.meetingInfo = async (req, res) => {
     // 미팅 아이디
     const criteria = {
         _id: req.params.meetingId
-    } 
+    }
 
     // 스페이스에서 받은 미팅정보와 DB에 저장되어있는 미팅정보 비교
     try {
-      
+
         let meetingInfo = await dbModels.Meeting.findOne(criteria).populate('enlistedMembers')
 
-        console.log(meetingInfo)
-   
+        console.log('[[meetingInfo]]', meetingInfo)
 
-        
+
+
         // 유효성 검사
         if (meetingInfo) {
             //임시 미팅 생성 시작
@@ -59,13 +59,13 @@ exports.meetingInfo = async (req, res) => {
             }
 
             dbModels.Doc.init();
-            let DocInfo = await dbModels.Doc.findOne({meetingId: docObj.meetingId});
+            let DocInfo = await dbModels.Doc.findOne({ meetingId: docObj.meetingId });
             // Doc이 없는 경우
-            if(!DocInfo){
+            if (!DocInfo) {
                 const docData = new dbModels.Doc(docObj);
                 await docData.save();
             }
-            
+
         } else {
             res.status(500).send('internal server error');
         }
@@ -148,9 +148,9 @@ exports.document = async (req, res) => {
           }).createReadStream()
             .on("error", error => {
             });
-         file.pipe(res);
+        file.pipe(res);
     })
-    
+
     // dbModels.Doc.findOne(criteria).then((result) => {
     //     const filePath = `./` + result.savePath;
     //     console.log(filePath);
@@ -207,13 +207,20 @@ exports.upload = async (req, res) => {
 
 }
 
+
+
+/*********************************
+*   미팅이 삭제되면 관련된 pdf파일들 전부 삭제
+*   _id: meeting의 id
+********************************/
 exports.deleteMeetingPdfFile = async (req, res) => {
 
     console.log(`
 --------------------------------------------------
+
   User : ${req.params.meetingId}
   API  : Delete my pdf
-  router.post(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
+  router.delete(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
 --------------------------------------------------`);
     const dbModels = global.DB_MODELS;
 
@@ -222,6 +229,7 @@ exports.deleteMeetingPdfFile = async (req, res) => {
         if (!req.query._id) {
             return res.status(400).send('invalid meeting id1');
         }
+
 
         result = await dbModels.Doc.findOne({ _id: req.query._id },{_id: false , saveKey:true, meetingId:true});
 
@@ -296,7 +304,6 @@ exports.deleteDrawingEvent = async (req, res) => {
 			message: 'drawing Event delete',
             meetingId: result.meetingId,
 		});
-		
 
     } catch (err) {
         console.log(err);

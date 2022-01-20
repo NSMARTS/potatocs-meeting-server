@@ -3,17 +3,8 @@ const router = require('express').Router();
 /*-----------------------------------
 	Contollers
 -----------------------------------*/
-const sideNavContoller = require('./side-nav/sideNav_controller');
-const spaceController = require('./space/space_controller');
+
 const meetingController = require('./meeting/meeting_controller')
-
-// // Folder and Space Create
-// router.post('/create-folder', sideNavContoller.createFolder);
-// router.post('/create-space', sideNavContoller.createSpace);
-// router.get('/update-space', sideNavContoller.updateSpace);
-
-// // in Space
-// router.get('/space/:spaceTime', spaceController.getSpace);
 
 
 // // meeting
@@ -24,8 +15,19 @@ const meetingController = require('./meeting/meeting_controller')
 
 // realTime
 router.get('/getMeetingData', meetingController.getMeetingData)
-
 router.get('/getUserData/:userId', meetingController.getUserData)
-
+// realTime chat
+router.post('/createChat', meetingController.createChat)
+router.get('/getChat', meetingController.getChat)
+router.delete('/deleteChat', meetingController.deleteChat)
+router.delete('/deleteAllOfChat', meetingController.deleteAllOfChat)
+// realTime members state
+router.get('/getParticipantState', meetingController.getParticipantState)
+router.get('/getOnlineTrue', meetingController.getOnlineTrue)
+router.get('/getOnlineFalse', meetingController.getOnlineFalse)
+// realTime members role
+router.get('/getRoleUpdate', meetingController.getRoleUpdate)
+// realTime meeting status
+router.get('/getMeetingStatus', meetingController.getMeetingStatus)
 
 module.exports = router;
