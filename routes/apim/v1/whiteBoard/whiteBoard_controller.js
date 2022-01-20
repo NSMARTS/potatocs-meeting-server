@@ -217,13 +217,12 @@ exports.deleteMeetingPdfFile = async (req, res) => {
 
     console.log(`
 --------------------------------------------------
-  User : ${req.query}
-  API  : Post my pdf
-  router.post(/deleteMeetingPdfFile', meetingContollder.deleteMeetingPdfFile);
+
+  User : ${req.params.meetingId}
+  API  : Delete my pdf
+  router.delete(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
 --------------------------------------------------`);
     const dbModels = global.DB_MODELS;
-
-    console.log('[ meetingId ]', req.query._id)
 
     try {
 
@@ -231,37 +230,80 @@ exports.deleteMeetingPdfFile = async (req, res) => {
             return res.status(400).send('invalid meeting id1');
         }
 
-        const criteria = {
-            meetingId: req.query._id,
-        }
 
-        // meetingId에 해당하는 모든 doc 파일들
-        const deletePdfFile = await dbModels.Doc.find(criteria);
+        result = await dbModels.Doc.findOne({ _id: req.query._id },{_id: false , saveKey:true, meetingId:true});
 
-        if (!deletePdfFile) {
+        if (!result) {
             return res.status(400).send('invalid meeting id2');
         }
+        // console.log(req.files[0])
+        const params = {
+			Bucket: bucket,
+			Key:  result.saveKey
+		};
+		s3.deleteObject(params,function(err, data){
+			if(err) console.log(err, err.stack);
+			else console.log('s3 delete Success');
+		})
+		await dbModels.Doc.findOneAndDelete(
+			{
+				_id: req.query._id
+			}
+		)
 
-        // 파일의 고유한 saveKey로 반복 삭제
-        for (let index = 0; index < deletePdfFile.length; index++) {
-            const element = deletePdfFile[index].saveKey;
-            const params = {
-                // Bucket: "potatocs-meeting-pdf",
-                Bucket: "test-potatocs",
-                Key: element
-            }
+        return res.status(200).send({
+			message: 'upload file delete',
+            meetingId: result.meetingId,
+		});
+		
 
-            // 그림을 그리는 화이트보드는 제외(s3에서 불러오는 화이트보드 파일)
-            if (element !== 'pdf/whiteboard.pdf') {
-                await s3.deleteObject(params, function (err, data) {
-                    if (err) console.log(err, err.stack);  // error
-                    else console.log('delete doc files');  // deleted
-                });
-            }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('internal server error');
+    }
 
-            // DB에 업로드 된 파일들도 함께 삭제
-            await dbModels.Doc.deleteOne(criteria);
+}
+
+exports.deleteDrawingEvent = async (req, res) => {
+
+    console.log(`
+--------------------------------------------------
+  User : ${req.params.meetingId}
+  API  : Delete my DrawingEvent
+  router.post(/deleteDrawingEvent/, meetingContollder.deleteDrawingEvent);
+--------------------------------------------------`);
+    const dbModels = global.DB_MODELS;
+
+    console.log(req.query)
+    try {
+
+        if (!req.query._id) {
+            return res.status(400).send('invalid meeting id');
         }
+
+        // result = await dbModels.Doc.findOneAndUpdate({ _id: req.query._id },{});
+
+
+        result = await dbModels.Doc.findOneAndUpdate(
+            { 
+                _id: req.query._id,
+                // 'drawingEventSet.pageNum' : req.query.currentPage
+            },
+            {
+                $pull : {
+                    drawingEventSet: {
+                        pageNum: req.query.currentPage
+                    }
+                }
+            }
+        );
+       
+        console.log(result);
+        
+        return res.status(200).send({
+			message: 'drawing Event delete',
+            meetingId: result.meetingId,
+		});
 
     } catch (err) {
         console.log(err);

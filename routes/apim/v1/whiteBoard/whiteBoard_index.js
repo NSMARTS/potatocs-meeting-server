@@ -72,4 +72,8 @@ router.delete('/deleteMeetingPdfFile', whiteBoardController.deleteMeetingPdfFile
 /* 드로잉 이벤트 삭제 */
 router.delete('/deleteDrawingEvent', whiteBoardController.deleteDrawingEvent);
 
+/* 미팅 삭제 시 s3에 있는 파일 삭제 */
+router.delete('/deleteMeetingPdfFile', whiteBoardController.deleteMeetingPdfFile)
+
+
 module.exports = router;
