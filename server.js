@@ -64,6 +64,12 @@ const config = require('./config/config');
 
 // [API] Routers
 app.use('/apim/v1', require('./routes/apim/v1'));
+// app.post('/deleteMeetingPdfFile', (req, res) => {
+//     console.log('[[[[ deleteMeetingPdfFile ]]]]', req.body._id)
+
+//     app.use('/apim/v1/whiteBoard/deleteMeetingPdfFile/', { params: req.body._id })
+ 
+// })
 
 // test
 
@@ -79,12 +85,7 @@ app.use('/', express.static(path.join(__dirname, '/client')));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
 
-app.post('/joinMeeting', (req, res) => {
-    console.log('[ joinMeeting ]', req.body)
 
-    
-    res.send('/apim/v1/whiteBoard/meetingInfo')
-})
 
 
 
@@ -165,10 +166,12 @@ const socketWebRTC = wsServer.of('/socketWebRTC');
 -----------------------------------------------*/
 const sharing = require('./controllers/webRTC/socketHandler-sharing.js')
 const drawing = require('./controllers/whiteBoard/socketHandler-drawing.js')
+const meetingChat = require('./controllers/webRTC/socketHandler-chat')
 
 socketWebRTC.on('connection', (socket) => {
     sharing(wsServer, socket, app )
     drawing(wsServer, socket, app)
+    meetingChat(wsServer, socket, app)
 });
 
 
@@ -193,4 +196,4 @@ app.use(function(req, res) {
         => Redirect to 'index.html'
     ============================================`)
      res.sendFile(__dirname+'/client/index.html');
-    });
+});
