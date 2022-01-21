@@ -23,7 +23,7 @@ module.exports = function (wsServer, socket, app) {
     })
   
 
-    socket.on('draw:teacher', (data) => {
+    socket.on('draw:teacher', async (data) => {
         console.log('client --------> server draw event')
         socket.broadcast.to(socket.meetingId).emit('draw:teacher', data);
         console.log(data)
@@ -34,10 +34,8 @@ module.exports = function (wsServer, socket, app) {
         // tool이 포인터이면 드로잉 이벤를 저장하지 않는다. 
         var res = {}
         if(data.drawingEvent.tool.type != 'pointer') {
-            res = dbModels.Doc.findOneAndUpdate({ '_id': data.docId }, { $push: { 'drawingEventSet': drawData } })
-        }
-        // app.locals.classInfo.shareDrawData = drawingEvent.drawVarArray;
-   
+            res = await dbModels.Doc.findOneAndUpdate({ '_id': data.docId }, { $push: { 'drawingEventSet': drawData } })
+        }   
     });
 
     socket.on('clearDrawingEvents', async (data) => {
