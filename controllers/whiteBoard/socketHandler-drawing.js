@@ -31,6 +31,7 @@ module.exports = function (wsServer, socket, app) {
             pageNum: data.pageNum,
             drawingEvent: data.drawingEvent
         }
+        
         // tool이 포인터이면 드로잉 이벤를 저장하지 않는다. 
         var res = {}
         if(data.drawingEvent.tool.type != 'pointer') {
