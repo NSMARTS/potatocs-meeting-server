@@ -78,8 +78,9 @@ module.exports = function (wsServer, socket, app) {
         page 전환 하는 경우 sync
      ---------------------------------------------*/
     socket.on('sync:page', (data) => {
+        console.log('doc to sync: ', data.docId);
         console.log('page to sync: ', data.pageNum);
-        socket.broadcast.to(data.meetingId).emit('sync:pageChange', data.pageNum);       
+        socket.broadcast.to(data.meetingId).emit('sync:pageChange', data);       
     });
 
     /*-------------------------------------------
