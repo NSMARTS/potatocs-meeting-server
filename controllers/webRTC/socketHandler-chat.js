@@ -97,9 +97,15 @@ module.exports = function (wsServer, socket, app) {
     });
 
      // 같은 room에 있는 모든 사람들 role 업데이트
-     socket.on('roleUpdate', (data) => {
+    socket.on('roleUpdate', (data) => {
         // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들 role 업데이트
         socket.broadcast.to(data).emit("refreshRole");
+    })
+
+    // // 같은 room에 있는 모든 사람들 role 업데이트
+    socket.on('updateParticipants', (data) => {
+        // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들 role 업데이트
+        socket.broadcast.to(roomname).emit("updateParticipants");
     })
 
 
