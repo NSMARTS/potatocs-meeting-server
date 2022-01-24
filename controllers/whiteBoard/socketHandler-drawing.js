@@ -8,6 +8,7 @@ module.exports = function (wsServer, socket, app) {
     socket.on('join:room', (meetingId) => {
         console.log('join Room:', meetingId);
         socket.join(meetingId);
+        socket.meetingId = meetingId;
     });
     
 
@@ -24,29 +25,24 @@ module.exports = function (wsServer, socket, app) {
 
     socket.on('draw:teacher', async (data) => {
         console.log('client --------> server draw event')
+        socket.broadcast.to(socket.meetingId).emit('draw:teacher', data);
         console.log(data)
         const drawData = {
             pageNum: data.pageNum,
             drawingEvent: data.drawingEvent
         }
+        
         // tool이 포인터이면 드로잉 이벤를 저장하지 않는다. 
         var res = {}
-        if(data.drawingEvent.tool.type == 'pointer'){
-            res = await dbModels.Doc.findOne({ '_id': data.docId }, {'_id':false,'meetingId':true})
-        } else { 
+        if(data.drawingEvent.tool.type != 'pointer') {
             res = await dbModels.Doc.findOneAndUpdate({ '_id': data.docId }, { $push: { 'drawingEventSet': drawData } })
-        }
-        // app.locals.classInfo.shareDrawData = drawingEvent.drawVarArray;
-        console.log(res);
-        console.log(res.meetingId);
-        console.log(socket.rooms);
-        socket.broadcast.to(res.meetingId).emit('draw:teacher', data);
+        }   
     });
 
     socket.on('clearDrawingEvents', async (data) => {
-        res = await dbModels.Doc.findOne({ '_id': data.docId }, {'_id':false,'meetingId':true})
+        // res = await dbModels.Doc.findOne({ '_id': data.docId }, {'_id':false,'meetingId':true})
         
-        socket.broadcast.to(res.meetingId).emit('clearDrawingEvents', data);
+        socket.broadcast.to(socket.meetingId).emit('clearDrawingEvents', data);
         
         result = await dbModels.Doc.findOneAndUpdate(
             { 

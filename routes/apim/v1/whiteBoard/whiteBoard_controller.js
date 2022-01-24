@@ -213,7 +213,6 @@ exports.upload = async (req, res) => {
 *   미팅이 삭제되면 관련된 pdf파일들 전부 삭제
 *   _id: meeting의 id
 ********************************/
-
 exports.deleteMeetingPdfFile = async (req, res) => {
 
     console.log(`
@@ -221,7 +220,7 @@ exports.deleteMeetingPdfFile = async (req, res) => {
 
   User : ${req.params.meetingId}
   API  : Delete my pdf
-  router.post(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
+  router.delete(/deleteMeetingPdfFile/, meetingContollder.deleteMeetingPdfFile);
 --------------------------------------------------`);
     const dbModels = global.DB_MODELS;
 

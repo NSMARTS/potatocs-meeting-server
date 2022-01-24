@@ -82,8 +82,6 @@ module.exports = function (wsServer, socket, app) {
     })
 
     socket.on("receiveVideoFrom", (data) => {
-        console.log('-----------aaaaaaaaaa----');
-        console.log(data.sender);
         receiveVideoFrom(socket, data.sender, data.sdpOffer, (error) => {
             if (error) {
                 console.error(error);
@@ -535,7 +533,6 @@ function receiveVideoFrom(socket, senderUserId, sdpOffer, callback) {
 
     let userSession = userRegister.getById(socket.id);
     let sender = userRegister.getByUserId(senderUserId);
-    console.log(sender)
     getEndpointForUser(userSession, sender, (error, endpoint) => {
         if (error) {
             console.error(error);
