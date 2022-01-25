@@ -126,7 +126,7 @@ module.exports = function (wsServer, socket, app) {
             }
         }
     });
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
         if (meeting_disconnect != null) {
             var data = {
                 userid: userid,
@@ -137,6 +137,29 @@ module.exports = function (wsServer, socket, app) {
                     console.error('leave Room error ' + err);
                 }
             });
+
+            const dbModels = global.DB_MODELS;
+
+          
+            // meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
+            // $는 배열의 몇 번째인지 index와 같은 역할
+            const getOnlineFalse = await dbModels.Meeting.findOneAndUpdate(
+                {
+                    _id: roomname, // meetingId
+                    'currentMembers.member_id' : socket.userid, // userId
+                },
+                {
+                    $set: {
+                        'currentMembers.$.online' : false
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+            console.log('[[ getOnlineFalse ]]', getOnlineFalse)      
+
+            
             meeting_disconnect = null;
         }
     });
