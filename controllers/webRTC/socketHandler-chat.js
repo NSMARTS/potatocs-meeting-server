@@ -39,6 +39,9 @@ module.exports = function (wsServer, socket, app) {
         username = data.userName;
         socket.username = username;
         console.log(roomname)
+        
+        // 자기 자신 포함 같은 room에 있는 사람들에게 입장했다고 알림
+        socketWebRTC.to(roomname).emit("notifier_in", username);
     });
 
 
@@ -87,11 +90,13 @@ module.exports = function (wsServer, socket, app) {
                 username: username,
                 roomname: roomname,
             }
+
             leaveRoom(socket, data, err => {
                 if (err) {
                     console.error('leave Room error ' + err);
                 }
             });
+
             meeting_disconnect = null;
         }
     });
