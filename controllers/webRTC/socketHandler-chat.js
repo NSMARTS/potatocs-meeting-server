@@ -46,22 +46,24 @@ module.exports = function (wsServer, socket, app) {
 
 
 
-
-    ////////// 채팅 //////////////// 
+    //////////////////////////////////////////////////////////
+    ////////// 채팅 보내기 //////////////// 
     socket.on('sendChat', (chatData) => {
         // 같은 room (meetingId로 판단)에 있는 사람에게 전송
         socket.join(chatData.meetingId);
         // 자기 자신 포함 같은 room (meetingId로 판단)에 있는 사람들
         socketWebRTC.to(chatData.meetingId).emit("receiveChatData", chatData);
     })
+    //////////////////////////////////////////////////////////
 
 
+    //////////////////////////////////////////////////////////
     // 같은 room에 있는 모든 사람들 채팅 삭제
     socket.on('deleteChat', (data) => {
         // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들
         socket.broadcast.to(data).emit("refreshChat");
     })
-
+    //////////////////////////////////////////////////////////
 
     socket.on("leaveRoom", (data) => {
         socket.leave(data.roomname);
@@ -73,6 +75,7 @@ module.exports = function (wsServer, socket, app) {
 
     });
 
+    
     socket.on("disconnecting", () => {
         let userSession = userRegister.getById(socket.id);
         if (userSession != undefined) {
@@ -84,7 +87,8 @@ module.exports = function (wsServer, socket, app) {
         }
     });
 
-    socket.on("disconnect", () => {
+
+    socket.on("disconnect", async() => {
         if (meeting_disconnect != null) {
             var data = {
                 username: username,
@@ -101,18 +105,25 @@ module.exports = function (wsServer, socket, app) {
         }
     });
 
+
+
+    //////////////////////////////////////////////////////////
      // 같은 room에 있는 모든 사람들 role 업데이트
     socket.on('roleUpdate', (data) => {
         // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들 role 업데이트
         socket.broadcast.to(data).emit("refreshRole");
     })
+    //////////////////////////////////////////////////////////
 
+
+
+    //////////////////////////////////////////////////////////
     // 자신을 제외한 같은 room에 있는 모든 사람들 on / offline 업데이트
     socket.on('updateParticipants', (data) => {
         // 자신을 제외한 같은 room에 있는 모든 사람들 on / offline 업데이트
         socket.broadcast.to(roomname).emit("updateParticipants");
     })
-
+    //////////////////////////////////////////////////////////
 
 
 

@@ -126,21 +126,28 @@ module.exports = function (wsServer, socket, app) {
             }
         }
     });
+
+
+    //////////////////////////////////////////////////////////
+    // socket disconnect 시 user online 유무, 나갔다고 알림
     socket.on("disconnect", async () => {
         if (meeting_disconnect != null) {
             var data = {
-                userid: userid,
+                userid: socket.userid,
                 roomname: roomname,
+                username: username
             }
             leaveRoom(socket, data, err => {
                 if (err) {
                     console.error('leave Room error ' + err);
                 }
             });
+            
 
+            /////////////////////////////////////////////////////
+            // 소켓 disconnect 시 해당 유저 online : true -> false
             const dbModels = global.DB_MODELS;
 
-          
             // meetingId를 이용하여 field 찾고 찾은 field에서 값 수정
             // $는 배열의 몇 번째인지 index와 같은 역할
             const getOnlineFalse = await dbModels.Meeting.findOneAndUpdate(
@@ -158,7 +165,14 @@ module.exports = function (wsServer, socket, app) {
                 }
             )
             console.log('[[ getOnlineFalse ]]', getOnlineFalse)      
+            /////////////////////////////////////////////////////
 
+
+            /////////////////////////////////////////////////////
+            // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들에게
+            // 나갔다고 notifier
+            socket.broadcast.to(data.roomname).emit("notifier_out",socket.username);
+            //////////////////////////////////////////////////////
             
             meeting_disconnect = null;
         }
