@@ -14,26 +14,33 @@ exports.signIn = async (req, res) => {
 --------------------------------------------------`);
 	console.log(req.body);
 
-	const criteria = {
-		email: req.body.email
-	}
-
 	try {
+
+        const criteria = {
+            email: req.body.email
+        }
+
 		const user = await member.findOne(criteria);
 
 		if(!user) {
-			console.log('No Matched Account');
+			// console.log('No Matched Account');
 			return res.status(404).send({
-				message: 'Cannot find an account'
+				message: 'not found'
+			});
+		}
+
+		if(user && user.retired == true){
+			return res.status(400).send({
+				message: `retired`
 			});
 		}
 
 		const isMatched = await user.comparePassword(req.body.password, user.password);
 
 		if(!isMatched) {
-			console.log('Password Mismatch');
+			// console.log('Password Mismatch');
 			return res.status(404).send({ 
-				message: 'Password Mismatch'
+				message: 'mismatch'
 			});
 		}
 
