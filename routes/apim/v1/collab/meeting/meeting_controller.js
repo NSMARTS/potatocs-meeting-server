@@ -64,6 +64,14 @@ exports.getUserData = async (req, res) => {
 		console.log('[[ getuserData ]]', userData)
 		console.log('-------------------------------------------')
 
+
+		if(!userData) {
+			// console.log('No Matched Account');
+			return res.status(404).send({
+				message: 'not found'
+			});
+		}
+
 		return res.send({
 			userData: userData
 		});
