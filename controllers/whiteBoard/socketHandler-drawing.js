@@ -18,15 +18,15 @@ module.exports = function (wsServer, socket, app) {
      *  - code 통일성을 위해서!
      */    
     socket.on('check:documents', (meetingRoomId) => {
-        console.log(meetingRoomId)
+        // console.log(meetingRoomId)
         socketWebRTC.to(meetingRoomId).emit('check:documents');
     })
   
 
     socket.on('draw:teacher', async (data) => {
-        console.log('client --------> server draw event')
+        // console.log('client --------> server draw event')
         socket.broadcast.to(socket.meetingId).emit('draw:teacher', data);
-        console.log(data)
+        // console.log(data)
         const drawData = {
             pageNum: data.pageNum,
             drawingEvent: data.drawingEvent
