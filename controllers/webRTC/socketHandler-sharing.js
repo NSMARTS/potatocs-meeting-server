@@ -455,25 +455,32 @@ function getRoom(roomName, callback) {
     let room = rooms[roomName];
     if (room == null) {
         console.log('create new room : ' + roomName);
-        getKurentoClient((error, kurentoClient) => {
-            if (error) {
-                return callback(error);
-            }
-            kurentoClient.create('MediaPipeline', (error, pipeline) => {
+        try {
+            console.log('111111111111')
+            getKurentoClient((error, kurentoClient) => {
                 if (error) {
                     return callback(error);
                 }
-                room = {
-                    name: roomName,
-                    pipeline: pipeline,
-                    participants: {},
-                    kurentoClient: kurentoClient
-                };
-
-                rooms[roomName] = room;
-                callback(null, room);
+                console.log('222222222')
+                kurentoClient.create('MediaPipeline', (error, pipeline) => {
+                    if (error) {
+                        return callback(error);
+                    }
+                    room = {
+                        name: roomName,
+                        pipeline: pipeline,
+                        participants: {},
+                        kurentoClient: kurentoClient
+                    };
+    
+                    rooms[roomName] = room;
+                    callback(null, room);
+                });
             });
-        });
+        } catch (error) {
+            console.log(error)
+        }
+        
 
     } else {
         console.log('get existing room : ' + roomName);
