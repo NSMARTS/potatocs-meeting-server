@@ -98,9 +98,9 @@ module.exports = function (wsServer, socket, app) {
     });
 
     socket.on("Screen_Sharing", async () => {
-        console.log('Screen_Sharing')
         renegotiation(socket);
     });
+    
     socket.on("video_device_change", async () => {
         console.log('video_device_change')
         renegotiation2(socket);
