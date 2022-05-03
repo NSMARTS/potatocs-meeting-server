@@ -425,7 +425,8 @@ function leaveRoom(socket, data, callback) {
         room.pipeline.release();
         delete rooms[userSession.roomName];
     }
-    delete userSession.roomName;
+    // delete userSession.roomName;
+    userRegister.unregister(socket.id)
 }
 
 function joinRoom(socket, roomName, callback) {
