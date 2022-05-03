@@ -9,13 +9,16 @@ module.exports = class Register {
     register(user) {
         
         this.usersByName[user.name] = user;
+
+
         this.usersByUserId[user.userId] = user;
         // console.log('register userId :' , this.usersByUserId[user.userId] )
         this.userSessionIds[user.id] = user;
-        // console.log('this.usersByName')
-        // console.log(this.usersByName)
-        // console.log('this.userSessionIds')
-        // console.log(this.userSessionIds)
+
+        console.log('this.usersByUserId')
+        console.log(this.usersByUserId)
+        console.log('this.userSessionIds')
+        console.log(this.userSessionIds)
     }
 
     unregister(name) {

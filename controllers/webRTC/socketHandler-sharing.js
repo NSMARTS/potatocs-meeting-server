@@ -577,6 +577,8 @@ function receiveVideoFrom(socket, senderUserId, sdpOffer, callback) {
 
     let userSession = userRegister.getById(socket.id);
     let sender = userRegister.getByUserId(senderUserId);
+
+    consol
     getEndpointForUser(userSession, sender, (error, endpoint) => {
         if (error) {
             console.error(error);
