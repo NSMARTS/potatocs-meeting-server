@@ -1,7 +1,7 @@
 module.exports = class Register {
     constructor() {
         // this.usersByName = {};
-        this.userSessionIds = {};
+        this.userSessionInfos = {};
         // this.usersByUserId = {};
     }
 
@@ -10,11 +10,18 @@ module.exports = class Register {
         
         // this.usersByName[user.name] = user;
 
+        let userSessionIds = Object.values(this.userSessionInfos).filter(item => {
+            return (item.roomName === user.roomName && item.userId === user.userId ) 
+         }).map(item2=> item2.id);
+
+         for (let userSessionId of userSessionIds) {
+             delete this.userSessionInfos(userSessionId)
+         }
 
         // this.usersByUserId[user.userId] = user;
         // console.log('register userId :' , this.usersByUserId[user.userId] )
-        this.userSessionIds[user.id] = user;
-
+        this.userSessionInfos[user.id] = user;
+        
         // console.log('this.usersByUserId')
         // console.log(this.usersByUserId)
         // console.log('this.userSessionIds')
@@ -22,12 +29,12 @@ module.exports = class Register {
     }
 
     unregister(socketId) {
-        console.log('this.userSessionIds----------------------------------------')
-        console.log(this.userSessionIds)
+        console.log('this.userSessionInfos----------------------------------------')
+        console.log(this.userSessionInfos)
         console.log('----------------------------------------')
-            delete this.userSessionIds[socketId];
+            delete this.userSessionInfos[socketId];
             console.log('----------------------------------------')
-            console.log(this.userSessionIds)
+            console.log(this.userSessionInfos)
             console.log('this.userSessionIdsDelete----------------------------------------')
     }
 
@@ -38,17 +45,20 @@ module.exports = class Register {
     // }
 
     getById(id) {
-        return this.userSessionIds[id];
+        return this.userSessionInfos[id];
     }
  
 
     getByRoomAndId(id, roomName) {
 
-        let userSession = Object.values(this.userSessionIds).filter(item => {
-            return (item.roomName === roomName && item.userId === id) 
+        console.log(id, roomName)
+
+ 
+        let userSession = Object.values(this.userSessionInfos).filter(item => {
+            return (item.roomName === roomName && item.userId === id ) 
          });
          
-         return userSession[0]
+         return userSession[userSession.length-1]
     }
 
 }

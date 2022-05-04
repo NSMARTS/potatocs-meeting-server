@@ -16,10 +16,12 @@ const argv = minimst(process.argv.slice(2), {
 var sessions = {};
 var candidatesQueue = {};
 
-var userid;
-var username;
-var roomname;
+// var userid;
+// var username;
+// var roomname;
 var bandwidth;
+
+let rooms = {};
 
 let meeting_disconnect = null;
 
@@ -38,27 +40,21 @@ module.exports = function (wsServer, socket, app) {
         console.log('-------- userInfo --------')
         console.log('[data]', data)
         
-        roomname = data.roomName;
-        username = data.userName;
-        userid = data.userid;
-        console.log('roomName : ' + roomname)
-        console.log('userName : ' + username)
+        // roomname = data.roomName;
+        // username = data.userName;
+        // userid = data.userid;
+        console.log('roomName : ' + data.roomName)
+        console.log('userName : ' + data.userName)
         bandwidth = 100;
         console.log('bandwidth : ' + bandwidth)
         console.log('----------------')
         // RoomList(data);
-        socket.join(roomname);
-        socket.username = username;
+        socket.join(data.roomName);
+        socket.username = data.userName;
         socket.userid = data.userId;
+        socket.roomName = data.roomName;
 
-        // RoomNumClient[roomname] += 1;
-        // const index = Rooms.findIndex(obj => obj.meeting_name == roomname);
-        // Rooms[index].meeting_num = RoomNumClient[roomname];
-
-        // let meeting_num = Rooms[index].meeting_num;
-        // wsServer.to(roomname).emit("meeting_num", meeting_num);
-
-        joinRoom(socket, roomname, err => {
+        joinRoom(socket, data.roomName, err => {
             if (err) {
                 console.error('join Room error ' + err);
             }
@@ -98,51 +94,46 @@ module.exports = function (wsServer, socket, app) {
     });
 
     socket.on("Screen_Sharing", async () => {
+        console.log('Screen_Sharing')
         renegotiation(socket);
     });
-    
     socket.on("video_device_change", async () => {
         console.log('video_device_change')
         renegotiation2(socket);
     });
 
-    socket.on("leaveRoom", (data) => {
-        socket.leave(data.roomname);
-        leaveRoom(socket, data, err => {
-            if (err) {
-                console.error('leave Room error ' + err);
-            }
-        });
+    // socket.on("leaveRoom", (data) => {
+    //     socket.leave(data.roomname);
+    //     leaveRoom(socket, data, err => {
+    //         if (err) {
+    //             console.error('leave Room error ' + err);
+    //         }
+    //     });
 
-    });
+    // });
 
-    socket.on("disconnecting", () => {
-        let userSession = userRegister.getById(socket.id);
-        if (userSession != undefined) {
-            if (userSession.roomName != undefined) {
-                meeting_disconnect = "disconnect during a meeting";
-                roomname = userSession.roomName;
-                userid = socket.userId;
-            }
-        }
-    });
+    // socket.on("disconnecting", () => {
+    //     let userSession = userRegister.getById(socket.id);
+    //     if (userSession != undefined) {
+    //         if (userSession.roomName != undefined) {
+    //             meeting_disconnect = "disconnect during a meeting";
+                
+    //         }
+    //     }
+    // });
 
 
     //////////////////////////////////////////////////////////
     // socket disconnect 시 user online 유무, 나갔다고 알림
     socket.on("disconnect", async () => {
-        if (meeting_disconnect != null) {
+
+        // if (meeting_disconnect != null) {
             var data = {
                 userid: socket.userid,
-                roomname: roomname,
-                username: username
+                roomName: socket.roomName,
+                userName: socket.userName
             }
-            leaveRoom(socket, data, err => {
-                if (err) {
-                    console.error('leave Room error ' + err);
-                }
-            });
-            
+           
 
             /////////////////////////////////////////////////////
             // 소켓 disconnect 시 해당 유저 online : true -> false
@@ -152,7 +143,7 @@ module.exports = function (wsServer, socket, app) {
             // $는 배열의 몇 번째인지 index와 같은 역할
             const getOnlineFalse = await dbModels.Meeting.findOneAndUpdate(
                 {
-                    _id: roomname, // meetingId
+                    _id: socket.roomName, // meetingId
                     'currentMembers.member_id' : socket.userid, // userId
                 },
                 {
@@ -171,17 +162,24 @@ module.exports = function (wsServer, socket, app) {
             /////////////////////////////////////////////////////
             // 자신을 제외한 같은 room (meetingId로 판단)에 있는 사람들에게
             // 나갔다고 notifier
-            socket.broadcast.to(data.roomname).emit("notifier_out",socket.username);
+            socket.broadcast.to(data.roomName).emit("notifier_out",socket.username);
             //////////////////////////////////////////////////////
             
+            leaveRoom(socket.id, err => {
+                if (err) {
+                    console.error('leave Room error ' + err);
+                }
+            });
+            
             meeting_disconnect = null;
-        }
+
+        // }
     });
 }
 
 
 
-let rooms = {};
+
 
 function renegotiation(socket) {
     let userSession = userRegister.getById(socket.id);
@@ -368,10 +366,10 @@ function RoomList(data) {
     return Rooms;
 }
 
-function leaveRoom(socket, data, callback) {
-    isHangup = true;
-    HangUp_user = data.userid;
-    roomname = data.roomname;
+function leaveRoom(socketId, callback) {
+    // isHangup = true;
+    // HangUp_user = data.userid;
+    // roomname = data.roomname;
     // RoomNumClient[roomname] -= 1;
 
     // const index = Rooms.findIndex(obj => obj.meeting_name == roomname);
@@ -384,35 +382,35 @@ function leaveRoom(socket, data, callback) {
     // wsServer.to(roomname).emit("meeting_num", meeting_num);
 
 
-    let userSession = userRegister.getById(socket.id);
+    let userSession = userRegister.getById(socketId);
 
     if (!userSession) {
         return;
     }
 
-    var room = rooms[userSession.roomName];
+    let room = rooms[userSession.roomName];
 
     if (!room) {
         return;
     }
 
-    console.log('notify all user that ' + userSession.name + ' is leaving the room ' + roomname);
+    console.log('notify all user that ' + userSession.name + ' is leaving the room ' + userSession.roomName);
 
-    var usersInRoom = room.participants;
+    let usersInRoom = room.participants;
     delete usersInRoom[userSession.userId];
     userSession.outgoingMedia.release();
 
-    for (var i in userSession.incomingMedia) {
+    for (let i in userSession.incomingMedia) {
         userSession.incomingMedia[i].release();
         delete userSession.incomingMedia[i];
     }
 
-    var data = {
+    const data = {
         id: 'participantLeft',
         userId: userSession.userId
     };
-    for (var i in usersInRoom) {
-        var user = usersInRoom[i];
+    for (let i in usersInRoom) {
+        let user = usersInRoom[i];
         // release viewer from this
         user.incomingMedia[userSession.userId]?.release();
         delete user.incomingMedia[userSession.userId];
@@ -426,7 +424,7 @@ function leaveRoom(socket, data, callback) {
         delete rooms[userSession.roomName];
     }
     // delete userSession.roomName;
-    userRegister.unregister(socket.id)
+    userRegister.unregister(socketId)
 }
 
 function joinRoom(socket, roomName, callback) {
@@ -443,6 +441,7 @@ function joinRoom(socket, roomName, callback) {
 
             console.log('join success : ' + socket.username);
             console.log('join success userid : ' + socket.userid);
+            console.log('join success roomName : ' + socket.roomName);
             if (err) {
                 callback(err);
                 return;
@@ -577,35 +576,43 @@ function join(socket, room, callback) {
 function receiveVideoFrom(socket, senderUserId, sdpOffer, callback) {
 
     let userSession = userRegister.getById(socket.id);
-    let sender = userRegister.getByUserId(senderUserId);
+    // let sender = userRegister.getByUserId(senderUserId);
 
-    consol
+    let sender = userRegister.getByRoomAndId(senderUserId, socket.roomName)
+   
+ 
     getEndpointForUser(userSession, sender, (error, endpoint) => {
-        if (error) {
-            console.error(error);
-            callback(error);
-        }
-
-        endpoint.processOffer(sdpOffer, (error, sdpAnswer) => {
-            console.log(`process offer from ${sender.userId} to ${userSession.userId}`);
-            if (error) {
-                return callback(error);
-            }
-            let data = {
-                id: 'receiveVideoAnswer',
-                userId: sender.userId,
-                sdpAnswer: sdpAnswer
-            };
-            userSession.sendMessage(data);
-
-            endpoint.gatherCandidates(error => {
+        try {
+            // if (error) {
+            //     console.error(error);
+            //     callback(error);
+            // }
+    
+            endpoint.processOffer(sdpOffer, (error, sdpAnswer) => {
+                console.log(`process offer from ${sender.userId} to ${userSession.userId}`);
                 if (error) {
                     return callback(error);
                 }
-            });
-
-            return callback(null, sdpAnswer);
-        });
+                let data = {
+                    id: 'receiveVideoAnswer',
+                    userId: sender.userId,
+                    sdpAnswer: sdpAnswer
+                };
+                userSession.sendMessage(data);
+    
+                endpoint.gatherCandidates(error => {
+                    if (error) {
+                        return callback(error);
+                    }
+                });
+    
+                return callback(null, sdpAnswer);
+            });    
+        } catch (error) {
+                console.error(error);
+                callback(error);
+        }
+        
     });
 }
 

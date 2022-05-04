@@ -90,8 +90,4 @@ module.exports = function (wsServer, socket, app) {
         console.log('back to FileList sync: ');
         socket.broadcast.to(data.meetingId).emit('sync:backToFileList');       
     });
-
-    socket.on('disconnect', async () => {
-        console.log('a user disconnected!');           
-    });
 }

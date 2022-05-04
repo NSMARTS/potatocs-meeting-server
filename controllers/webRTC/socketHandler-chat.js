@@ -16,9 +16,9 @@ const argv = minimst(process.argv.slice(2), {
 var sessions = {};
 var candidatesQueue = {};
 
-var username;
-var roomname;
-var bandwidth;
+// var username;
+// var roomname;
+// var bandwidth;
 
 let meeting_disconnect = null;
 
@@ -35,13 +35,13 @@ module.exports = function (wsServer, socket, app) {
     const socketWebRTC = wsServer.of('/socketWebRTC');
     // 룸에 참가.    
     socket.on('userInfo', (data) => {
-        roomname = data.roomName;
-        username = data.userName;
-        socket.username = username;
-        console.log(roomname)
+        const roomName = data.roomName;
+        const userName = data.userName;
+        socket.userName = userName;
+        console.log(roomName)
         
         // 자기 자신 포함 같은 room에 있는 사람들에게 입장했다고 알림
-        socketWebRTC.to(roomname).emit("notifier_in", username);
+        socketWebRTC.to(roomName).emit("notifier_in", userName);
     });
 
 
@@ -65,45 +65,45 @@ module.exports = function (wsServer, socket, app) {
     })
     //////////////////////////////////////////////////////////
 
-    socket.on("leaveRoom", (data) => {
-        socket.leave(data.roomname);
-        leaveRoom(socket, data, err => {
-            if (err) {
-                console.error('leave Room error ' + err);
-            }
-        });
+    // socket.on("leaveRoom", (data) => {
+    //     socket.leave(data.roomname);
+    //     leaveRoom(socket, data, err => {
+    //         if (err) {
+    //             console.error('leave Room error ' + err);
+    //         }
+    //     });
 
-    });
+    // });
 
     
-    socket.on("disconnecting", () => {
-        let userSession = userRegister.getById(socket.id);
-        if (userSession != undefined) {
-            if (userSession.roomName != undefined) {
-                meeting_disconnect = "disconnect during a meeting";
-                roomname = userSession.roomName;
-                username = socket.username;
-            }
-        }
-    });
+    // socket.on("disconnecting", () => {
+    //     let userSession = userRegister.getById(socket.id);
+    //     if (userSession != undefined) {
+    //         if (userSession.roomName != undefined) {
+    //             meeting_disconnect = "disconnect during a meeting";
+    //             roomname = userSession.roomName;
+    //             username = socket.username;
+    //         }
+    //     }
+    // });
 
 
-    socket.on("disconnect", async() => {
-        if (meeting_disconnect != null) {
-            var data = {
-                username: username,
-                roomname: roomname,
-            }
+    // socket.on("disconnect", async() => {
+    //     if (meeting_disconnect != null) {
+    //         var data = {
+    //             username: username,
+    //             roomname: roomname,
+    //         }
 
-            leaveRoom(socket, data, err => {
-                if (err) {
-                    console.error('leave Room error ' + err);
-                }
-            });
+    //         leaveRoom(socket, data, err => {
+    //             if (err) {
+    //                 console.error('leave Room error ' + err);
+    //             }
+    //         });
 
-            meeting_disconnect = null;
-        }
-    });
+    //         meeting_disconnect = null;
+    //     }
+    // });
 
 
 
@@ -116,12 +116,12 @@ module.exports = function (wsServer, socket, app) {
     //////////////////////////////////////////////////////////
 
 
-
+ 
     //////////////////////////////////////////////////////////
     // 자신을 제외한 같은 room에 있는 모든 사람들 on / offline 업데이트
     socket.on('updateParticipants', (data) => {
         // 자신을 제외한 같은 room에 있는 모든 사람들 on / offline 업데이트
-        socket.broadcast.to(roomname).emit("updateParticipants");
+        socket.broadcast.to(socket.roomName).emit("updateParticipants");
     })
     //////////////////////////////////////////////////////////
 

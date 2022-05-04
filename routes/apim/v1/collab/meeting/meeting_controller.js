@@ -14,7 +14,7 @@ exports.getMeetingData = async (req, res) => {
 	const dbModels = global.DB_MODELS;
 
 	const meetingId = req.query.meetingId;
-	console.log('[[ meetingId ]]', meetingId)
+	// console.log('[[ meetingId ]]', meetingId)
 
 	const criteria = {
 		_id: req.query.meetingId,
@@ -23,7 +23,7 @@ exports.getMeetingData = async (req, res) => {
 
 	try {
 		const meetingData = await dbModels.Meeting.findOne(criteria).populate('enlistedMembers')
-		console.log('[[ getMeetingData ]]', meetingData)
+		// console.log('[[ getMeetingData ]]', meetingData)
 		console.log('-------------------------------------------')
 
 		return res.send({
@@ -52,7 +52,7 @@ exports.getUserData = async (req, res) => {
 	const dbModels = global.DB_MODELS;
 
 	const userId = req.params.userId;
-	console.log('[[ userId ]]', userId)
+	// console.log('[[ userId ]]', userId)
 
 	const criteria = {
 		_id: req.params.userId,
@@ -61,7 +61,7 @@ exports.getUserData = async (req, res) => {
 
 	try {
 		const userData = await dbModels.Member.findOne(criteria);
-		console.log('[[ getuserData ]]', userData)
+		// console.log('[[ getuserData ]]', userData)
 		console.log('-------------------------------------------')
 
 
@@ -105,7 +105,7 @@ exports.createChat = async (req, res) => {
 		}
 
 		const Meeting = dbModels.MeetingChat(criteria);
-		console.log("[[ createChat ]] >>>>", Meeting)
+		// console.log("[[ createChat ]] >>>>", Meeting)
 		await Meeting.save();
 
 		return res.status(200).send(
@@ -132,7 +132,7 @@ exports.getChat = async (req, res) => {
   API  : Get a chat
   router.get('/getChat', MeetingContollder.getChat);
 --------------------------------------------------`);
-	console.log('[[getChat]] >>>>>> ', req.query.meetingId)
+	// console.log('[[getChat]] >>>>>> ', req.query.meetingId)
 
 	const dbModels = global.DB_MODELS;
 
@@ -172,7 +172,7 @@ exports.deleteChat = async (req, res) => {
   API  : Get a chat
   router.delete('/deleteChat', MeetingContollder.deleteChat);
 --------------------------------------------------`);
-	console.log('[[deleteChat meetingId]] >>>>>> ', req.query.chatId)
+	// console.log('[[deleteChat meetingId]] >>>>>> ', req.query.chatId)
 
 	const dbModels = global.DB_MODELS;
 
@@ -189,7 +189,7 @@ exports.deleteChat = async (req, res) => {
         // meetingId에 해당하는 채팅 query
         const deleteChat = await dbModels.MeetingChat.findOne(criteria);
 
-		console.log(deleteChat)
+		// console.log(deleteChat)
 
         if (!deleteChat) {
             return res.status(400).send('invalid meeting chat');
@@ -237,7 +237,7 @@ exports.deleteAllOfChat = async (req, res) => {
         // meetingId에 해당하는 모든 채팅들 query
         const deleteChat = await dbModels.MeetingChat.find(criteria);
 
-		console.log(deleteChat)
+		// console.log(deleteChat)
 
         if (!deleteChat) {
             return res.status(400).send('invalid meeting chat');
@@ -278,7 +278,7 @@ exports.getParticipantState = async (req, res) => {
 		}
 	
 		const currentMembers = await dbModels.Meeting.find(criteria).select('currentMembers');
-		console.log('[[ getParticipantState ]]', currentMembers)
+		// console.log('[[ getParticipantState ]]', currentMembers)
 		console.log('-------------------------------------------')
 
 	
@@ -310,7 +310,7 @@ exports.getOnlineTrue = async (req, res) => {
   API  : Get a role
   router.get('/getOnlineTrue', MeetingContollder.getOnlineTrue);
 --------------------------------------------------`);
-	console.log('[[getOnlineTrue]] >>>>>> ', req.query)
+	// console.log('[[getOnlineTrue]] >>>>>> ', req.query)
 
 	/**
 	 * req.query = {
@@ -336,7 +336,7 @@ exports.getOnlineTrue = async (req, res) => {
 				new: true
 			}
 		)
-		console.log('[[ getOnlineTrue ]]', getOnlineTrue)
+		// console.log('[[ getOnlineTrue ]]', getOnlineTrue)
 		console.log('-------------------------------------------')
 
 	
@@ -367,7 +367,7 @@ exports.getOnlineFalse = async (req, res) => {
   API  : Get a role
   router.get('/getOnlineFalse', MeetingContollder.getOnlineFalse);
 --------------------------------------------------`);
-	console.log('[[getOnlineFalse]] >>>>>> ', req.query)
+	// console.log('[[getOnlineFalse]] >>>>>> ', req.query)
 
 	const dbModels = global.DB_MODELS;
 
@@ -389,7 +389,7 @@ exports.getOnlineFalse = async (req, res) => {
 				new: true
 			}
 		)
-		console.log('[[ getOnlineFalse ]]', getOnlineFalse)
+		// console.log('[[ getOnlineFalse ]]', getOnlineFalse)
 
 	
 		if (!getOnlineFalse) {
@@ -443,7 +443,7 @@ exports.getRoleUpdate = async (req, res) => {
 				new: true
 			}
 		)
-		console.log('[[ getRoleUpdate ]]', getRoleUpdate)
+		// console.log('[[ getRoleUpdate ]]', getRoleUpdate)
 	
 		if (!getRoleUpdate) {
             return res.status(400).send('invalid meeting online');
@@ -473,7 +473,7 @@ exports.getMeetingStatus = async (req, res) => {
   API  : Get a meeting status
   router.get('/getMeetingStatus', MeetingContollder.getMeetingStatus);
 --------------------------------------------------`);
-	console.log('[[getMeetingStatus]] >>>>>> ', req.query)
+	// console.log('[[getMeetingStatus]] >>>>>> ', req.query)
 
 	const dbModels = global.DB_MODELS;
 
@@ -485,7 +485,7 @@ exports.getMeetingStatus = async (req, res) => {
 		
 		// meetingId를 이용하여 status 값 확인
 		const getMeetingStatus = await dbModels.Meeting.findOne(criteria).select('status');
-		console.log('[[ getMeetingStatus ]]', getMeetingStatus)
+		// console.log('[[ getMeetingStatus ]]', getMeetingStatus)
 	
 		if (!getMeetingStatus) {
             return res.status(400).send('invalid getMeetingStatus');
