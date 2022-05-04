@@ -155,8 +155,8 @@ module.exports = function (wsServer, socket, app) {
                     new: true
                 }
             )
-            console.log('[[ getOnlineFalse ]]', getOnlineFalse)      
-            /////////////////////////////////////////////////////
+            // console.log('[[ getOnlineFalse ]]', getOnlineFalse)      
+            ///////////////////////////////////////////////////// 
 
 
             /////////////////////////////////////////////////////
@@ -170,9 +170,10 @@ module.exports = function (wsServer, socket, app) {
                     console.error('leave Room error ' + err);
                 }
             });
+
+            console.log('user disconnect!', socket.username) 
             
             meeting_disconnect = null;
-
         // }
     });
 }
