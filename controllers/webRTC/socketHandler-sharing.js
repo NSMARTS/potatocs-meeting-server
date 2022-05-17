@@ -578,31 +578,33 @@ function receiveVideoFrom(socket, senderUserId, sdpOffer, callback) {
     let userSession = userRegister.getById(socket.id);
     let sender = userRegister.getByUserId(senderUserId);
     getEndpointForUser(userSession, sender, (error, endpoint) => {
-        if (error) {
-            console.error(error);
-            callback(error);
-        }
-
-        endpoint.processOffer(sdpOffer, (error, sdpAnswer) => {
-            console.log(`process offer from ${sender.userId} to ${userSession.userId}`);
-            if (error) {
-                return callback(error);
-            }
-            let data = {
-                id: 'receiveVideoAnswer',
-                userId: sender.userId,
-                sdpAnswer: sdpAnswer
-            };
-            userSession.sendMessage(data);
-
-            endpoint.gatherCandidates(error => {
+        try {
+           
+            endpoint.processOffer(sdpOffer, (error, sdpAnswer) => {
+                console.log(`process offer from ${sender.userId} to ${userSession.userId}`);
                 if (error) {
                     return callback(error);
                 }
+                let data = {
+                    id: 'receiveVideoAnswer',
+                    userId: sender.userId,
+                    sdpAnswer: sdpAnswer
+                };
+                userSession.sendMessage(data);
+    
+                endpoint.gatherCandidates(error => {
+                    if (error) {
+                        return callback(error);
+                    }
+                });
+    
+                return callback(null, sdpAnswer);
             });
-
-            return callback(null, sdpAnswer);
-        });
+        } catch (error) {
+                console.error(error);
+                callback(error);
+        }
+        
     });
 }
 
