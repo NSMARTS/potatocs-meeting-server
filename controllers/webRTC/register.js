@@ -8,24 +8,29 @@ module.exports = class Register {
 
     register(user) {
         
-        // this.usersByName[user.name] = user;
+        try {
+            // this.usersByName[user.name] = user;
+            let userSessionIds = Object.values(this.userSessionInfos).filter(item => {
+                return (item.roomName === user.roomName && item.userId === user.userId ) 
+             }).map(item2=> item2.id);
+    
+             for (let userSessionId of userSessionIds) {
+                 delete this.userSessionInfos(userSessionId)
+             }
+    
+            // this.usersByUserId[user.userId] = user;
+            // console.log('register userId :' , this.usersByUserId[user.userId] )
+            this.userSessionInfos[user.id] = user;
+            
+            // console.log('this.usersByUserId')
+            // console.log(this.usersByUserId)
+            // console.log('this.userSessionIds')
+            // console.log(this.userSessionIds)
+        } catch (error) {
+            console.log(error)
+        }
 
-        let userSessionIds = Object.values(this.userSessionInfos).filter(item => {
-            return (item.roomName === user.roomName && item.userId === user.userId ) 
-         }).map(item2=> item2.id);
-
-         for (let userSessionId of userSessionIds) {
-             delete this.userSessionInfos(userSessionId)
-         }
-
-        // this.usersByUserId[user.userId] = user;
-        // console.log('register userId :' , this.usersByUserId[user.userId] )
-        this.userSessionInfos[user.id] = user;
         
-        // console.log('this.usersByUserId')
-        // console.log(this.usersByUserId)
-        // console.log('this.userSessionIds')
-        // console.log(this.userSessionIds)
     }
 
     unregister(socketId) {

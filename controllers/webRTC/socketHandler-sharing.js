@@ -642,75 +642,80 @@ function addIceCandidate(socket, message, callback) {
 }
 function getEndpointForUser(userSession, sender, callback) {
 
-    if (userSession.userId === sender.userId) {
-        return callback(null, userSession.outgoingMedia);
-    }
-
-    let incoming = userSession.incomingMedia[sender.userId];
-    console.log(userSession.userId + "    " + sender.userId);
-    if (incoming == null) {
-        console.log(`user : ${userSession.id} create endpoint to receive video from : ${sender.id}`);
-        getRoom(userSession.roomName, (error, room) => {
-            if (error) {
-                console.error(error);
-                callback(error);
-                return;
-            }
-            room.pipeline.create('WebRtcEndpoint', (error, incoming) => {
+    try {
+        if (userSession.userId === sender.userId) {
+            return callback(null, userSession.outgoingMedia);
+        }
+    
+        let incoming = userSession.incomingMedia[sender.userId];
+        console.log(userSession.userId + "    " + sender.userId);
+        if (incoming == null) {
+            console.log(`user : ${userSession.id} create endpoint to receive video from : ${sender.id}`);
+            getRoom(userSession.roomName, (error, room) => {
                 if (error) {
-                    if (Object.keys(room.participants).length === 0) {
-                        room.pipeline.release();
-                    }
-                    console.error('error: ' + error);
+                    console.error(error);
                     callback(error);
                     return;
                 }
-
-                console.log(`user: ${userSession.userId} successfully create pipeline`);
-                incoming.setMaxVideoRecvBandwidth(bandwidth);
-                incoming.setMinVideoRecvBandwidth(bandwidth);
-                userSession.incomingMedia[sender.userId] = incoming;
-
-
-                // add ice candidate the get sent before endpoints is establlished
-                let iceCandidateQueue = userSession.iceCandidateQueue[sender.userId];
-                if (iceCandidateQueue) {
-                    while (iceCandidateQueue.length) {
-                        let message = iceCandidateQueue.shift();
-                        console.log(`user: ${userSession.userId} collect candidate for ${message.data.sender}`);
-                        incoming.addIceCandidate(message.candidate);
-                    }
-                }
-
-                incoming.on('OnIceCandidate', event => {
-
-                    let candidate = kurento.register.complexTypes.IceCandidate(event.candidate);
-                    userSession.sendMessage({
-                        id: 'iceCandidate',
-                        userId: sender.userId,
-                        candidate: candidate
-                    });
-                });
-
-                sender.outgoingMedia.connect(incoming, error => {
+                room.pipeline.create('WebRtcEndpoint', (error, incoming) => {
                     if (error) {
-                        console.log(error);
+                        if (Object.keys(room.participants).length === 0) {
+                            room.pipeline.release();
+                        }
+                        console.error('error: ' + error);
                         callback(error);
                         return;
                     }
-                    callback(null, incoming);
+    
+                    console.log(`user: ${userSession.userId} successfully create pipeline`);
+                    incoming.setMaxVideoRecvBandwidth(bandwidth);
+                    incoming.setMinVideoRecvBandwidth(bandwidth);
+                    userSession.incomingMedia[sender.userId] = incoming;
+    
+    
+                    // add ice candidate the get sent before endpoints is establlished
+                    let iceCandidateQueue = userSession.iceCandidateQueue[sender.userId];
+                    if (iceCandidateQueue) {
+                        while (iceCandidateQueue.length) {
+                            let message = iceCandidateQueue.shift();
+                            console.log(`user: ${userSession.userId} collect candidate for ${message.data.sender}`);
+                            incoming.addIceCandidate(message.candidate);
+                        }
+                    }
+    
+                    incoming.on('OnIceCandidate', event => {
+    
+                        let candidate = kurento.register.complexTypes.IceCandidate(event.candidate);
+                        userSession.sendMessage({
+                            id: 'iceCandidate',
+                            userId: sender.userId,
+                            candidate: candidate
+                        });
+                    });
+    
+                    sender.outgoingMedia.connect(incoming, error => {
+                        if (error) {
+                            console.log(error);
+                            callback(error);
+                            return;
+                        }
+                        callback(null, incoming);
+                    });
                 });
+            })
+        } else {
+            console.log(`user: ${userSession.name} get existing endpoint to receive video from: ${sender.name}`);
+            sender.outgoingMedia.connect(incoming, error => {
+                if (error) {
+                    callback(error);
+                }
+                callback(null, incoming);
             });
-        })
-    } else {
-        console.log(`user: ${userSession.name} get existing endpoint to receive video from: ${sender.name}`);
-        sender.outgoingMedia.connect(incoming, error => {
-            if (error) {
-                callback(error);
-            }
-            callback(null, incoming);
-        });
+        }
+    } catch (error) {
+        console.log(error)
     }
+    
 }
 
 
