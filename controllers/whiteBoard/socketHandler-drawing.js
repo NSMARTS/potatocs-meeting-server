@@ -56,13 +56,13 @@ module.exports = function (wsServer, socket, app) {
     /*-------------------------------------------
         page 전환 하는 경우 sync
      ---------------------------------------------*/
-    // socket.on('sync:page', (data) => {
-    //     console.log('page to sync: ', data.pageNum);
-    //     socket.broadcast.to(data.meetingId).emit('sync:page', data.pageNum);       
-    // });
+    socket.on('sync:page', (data) => {
+        console.log('page to sync: ', data.pageNum);
+        socket.broadcast.to(data.meetingId).emit('sync:pageChange', data.pageNum);       
+    });
 
     /*-------------------------------------------
-        doc. List 전환 하는 경우 sync
+        doc. List (문서 목록으로) 하는 경우 sync
      ---------------------------------------------*/
      socket.on('sync:FileList', (data) => {
         console.log('back to FileList sync: ');
